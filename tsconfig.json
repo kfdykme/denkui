@@ -1,0 +1,19 @@
+{
+    "compilerOptions": {
+        "outDir": "./dist/",
+        "sourceMap": true,
+        "noImplicitAny": true,
+        "module": "commonjs", 
+        "moduleResolution": "node",
+        "target": "es6"
+        // "paths": {
+        //     "*": [
+        //         "node_modules/*",
+        //         "src/*"
+        //     ]
+        // }
+    },
+    "include": [
+        "./src/**/*"
+    ]
+}

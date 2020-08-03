@@ -1,0 +1,1 @@
+// import A from './intermediate/app.js';console.info(A);
