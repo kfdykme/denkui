@@ -1,0 +1,7 @@
+intermediate/**/*
+dist/**/*
+*~
+
+
+//node module
+node_modules

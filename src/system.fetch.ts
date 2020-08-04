@@ -3,7 +3,7 @@
  
 export default {
     fetch: (o:any)=> {
-        // console.info(o)
+        console.info("FETCH FETCH",o)
         return o
     }
 }
