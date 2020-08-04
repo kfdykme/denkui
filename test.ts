@@ -1,3 +1,6 @@
+/*
+ * @Author: kfdykme
+ */ 
 // import a from './intermediate/js/Start/Login/index.js';
 
 let path = 'Start/Login/login.js';
@@ -14,3 +17,7 @@ import {FileLoader} from './FileLoader.ts'
 let result = FileLoader.getInstance().load(path)
 
 console.info(result)
+console.info('load')
+let module = await import(result.path)
+
+console.info(module)

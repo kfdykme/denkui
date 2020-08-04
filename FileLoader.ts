@@ -4,7 +4,9 @@ const SOURCE_ROOT_PATH = '../src/'
 let sInstance:FileLoader|null = null
 export class FileLoader {
     decoder:TextDecoder
+    encoder:TextEncoder
     constructor() { 
+        this.encoder = new TextEncoder();
         this.decoder = new TextDecoder('utf-8');
     }
 
@@ -24,31 +26,41 @@ export class FileLoader {
         //1 load file content
         let content = new TextDecoder('utf-8').decode(Deno.readFileSync(loadPath))
         //2,3 in loadContent function
-        this.loadContent(content, path)
+        let res = this.loadContent(content, path)
     
-
-      
+        console.info('FileLoader load', 'try write to ' + path)
+        
+        
+        Deno.mkdirSync(MIDDLE_JS_OUTPUT_PATH + this.getDirPathFromFilePath(path), { recursive: true})
+        Deno.writeFileSync(MIDDLE_JS_OUTPUT_PATH + path ,
+            this.encoder.encode(res.content))
+        return {
+            content: res.content,
+            path:MIDDLE_JS_OUTPUT_PATH + path
+        }
     }
 
     loadContent(content: string, path:string) {
-        //2 load imports
+        //2 load imports 
         const regImport =  /import +.*? from +(.*);?/g
         let improts = content.match(regImport)
         improts?.forEach((imp:string) => {
             const regItem = /import +.*? from +(.*);?/
             let res = regItem.exec(imp)
-            console.info('FIleLoader load import:[' + imp+ ']')//,regImport, res)
+            console.info('FileLoader load mport:[' + imp+ ']')//,regImport, res)
             if (res &&res?.length > 1) {
                 let regTarget = res[1] 
                 if (regTarget.startsWith('\'@system')
                 || regTarget.startsWith('"@system')) {
                    content = this.loadSystemModule(imp, regTarget, content)
+                } else if (regTarget.includes("https")) {
+                    // do nothing
                 } else if (regTarget.includes('/')){
-                    this.loadOtherModule(imp, regTarget, path)
+                   content = this.loadOtherModule(imp, regTarget, path,content)
                 }
             } else {
                 
-            console.info(res, res?.length)
+             console.info(res, res?.length)
             }
         })
         //2.1 get imports 
@@ -65,14 +77,16 @@ export class FileLoader {
         // fetch.ts
         console.info("FileLoader load loadSystemModule")
         target =target.substring(0,target.length-1)
-       return content.replace(importStatement,importStatement.replace(target,target.replace('@system','file:///C:/Users/kfmechen/Desktop/wor/bbs-quick/denkui/src/system') + '.ts'))
+       return content.replace(importStatement,importStatement.replace(target,target.replace('@system','file:///C:/Users/wimkf/wor/bbs-quick/denkui/src/system') + '.ts'))
     }
 
-    loadOtherModule(importStatement:string, target:string,currentFilePath:string) {
+    loadOtherModule(importStatement:string, target:string,currentFilePath:string, content:string) {
         console.info('FileLoader loadOtherModule')
         console.info(importStatement, target, currentFilePath)
         // 去除前后符号
         target = target.replace(/\'/g, '').replace(/\"/g,'')
+        //TODO 这样写不太好 逻辑不是很顺
+        content = content.replace(target, target + '.js')
         let info:any = {
             currentFilePath,
             currentFileDirPath: this.getDirPathFromFilePath(currentFilePath)
@@ -97,7 +111,11 @@ export class FileLoader {
         targetFileContent = res.content + ""
         // 1.2 load and write target file to out dir
         Deno.writeFileSync(MIDDLE_JS_OUTPUT_PATH + info.currentFileDirPath +  info.targetFilePath + '.js',
-        new TextEncoder().encode(targetFileContent))
+        this.encoder.encode(targetFileContent))
+
+        // 
+
+        return content
     }
 
     getDirPathFromFilePath(filePath: string) {
@@ -115,6 +133,7 @@ export class FileLoader {
     }
 
     makeSureDir(path:string) {
+        console.info("FileLoader makeSureDir try ", path)
         Deno.mkdirSync(path, {recursive: true})
         console.info("FileLoader makeSureDir", path)
     }
