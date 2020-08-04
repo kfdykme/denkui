@@ -2,7 +2,7 @@
  * @Author: kfdykme
 --> 
 
-- 介绍
+### 介绍
 
 目标是实现一个跨平台的前端转桌面应用的套件。
 
@@ -17,16 +17,16 @@
 - 暂时的想法是这样
 
 
-
+### TODO
 TODO MODULE | TODO TASK | TASK STAUS 
 --- | --- | --- | 
 Part 1 : Trans from quickapp to Deno Code | Load From Manifest | -
- -  | Load a single js file | DONE
+ |-  | Load a single js file | DONE
 Part 2 : System skill power   | fetch  网络请求|
- - | prompt  建议通信 | -
- - | storage 存储能力 | -
- - | router 路由能力 | - 
- - | request 上传下载能力 | - 
- - | network 网络状态相关能力 | -
+ |- | prompt  建议通信 | -
+ |- | storage 存储能力 | -
+ |- | router 路由能力 | - 
+ |- | request 上传下载能力 | - 
+ |- | network 网络状态相关能力 | -
 Part 3 : A pipe module | - | -
 Part 4 : UI Module in windows | - | -
