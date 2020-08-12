@@ -1,5 +1,8 @@
-const MIDDLE_JS_OUTPUT_PATH = './intermediate/js/'
+const MIDDLE_JS_OUTPUT_PATH = '../intermediate/js/'
 const SOURCE_ROOT_PATH = '../src/'
+
+import ManifestLoader from './ManifestLoader.ts'
+import {readTag} from './TagReader.ts'
 
 let sInstance:FileLoader|null = null
 export class FileLoader {
@@ -17,6 +20,42 @@ export class FileLoader {
         return sInstance
     }
 
+    loadRoute(route: string) {
+        console.info('FileLoader loadRoute', route)
+        //1 到Manifest去找route的相关内容
+        let manifestLoader = new ManifestLoader(SOURCE_ROOT_PATH)
+        let o = manifestLoader.get()
+        let routerPage = o.router.pages[route]?.component
+        
+        // 2 load ux 
+        let realPagePath = route + '/' + routerPage + '.ux'
+        console.info('result', route + '/' + routerPage)
+        this.load(realPagePath)
+    }
+
+    loadUx(content:string,path:string) {
+        console.info("FileLoader loadUx", path)
+        //1 get script content or src attr 
+        let realPath = SOURCE_ROOT_PATH + path
+        let tag = readTag('script', realPath)
+        console.info(tag)
+        let conetnt = ''
+        if (tag.content !== '') {
+            content = tag.content
+        } else if (tag.params.src) {
+            let dirPath = this.getDirPathFromFilePath(realPath)
+            content = this.decoder.decode(Deno.readFileSync(
+                dirPath + tag.params.src
+            ))
+            console.info(content)
+        } else {
+            console.error("FileLoader loadUx", 'fail')
+        }
+        return {
+            content: content
+        }
+    }
+
     load(path:string) {
         console.info('FileLoader load', path)
         //0 find target file from source dir
@@ -26,8 +65,15 @@ export class FileLoader {
         //1 load file content
         let content = new TextDecoder('utf-8').decode(Deno.readFileSync(loadPath))
         //2,3 in loadContent function
-        let res = this.loadContent(content, path)
-    
+        // if is js file
+        let res:any 
+        if (path.includes('.js')) {
+            res = this.loadContent(content, path)
+        } else {
+        // else if is ux file 
+            res = this.loadUx(content, path)
+        }
+        
         console.info('FileLoader load', 'try write to ' + path)
         
         

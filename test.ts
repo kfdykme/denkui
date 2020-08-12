@@ -12,14 +12,16 @@ let pathApp = 'app.js'
 
 // module.default.doLogin()
 
-import {FileLoader} from './FileLoader.ts'
+import {FileLoader} from './src/core/FileLoader.ts'
+import router from './src/system.router.ts'
+import {readTag } from './src/core/TagReader.ts'
+// let result = FileLoader.getInstance().load(path)
 
-let result = FileLoader.getInstance().load(path)
-
-console.info(result)
-console.info('load')
-let module = await import(result.path)
-let loginApp = module.default 
+// console.info(result)
+// let loginApp = module.default 
+let loginApp = await router.push({
+    uri: path
+})
 
 let appModule = await import(
     FileLoader.getInstance().load(pathApp).path
@@ -37,4 +39,10 @@ loginApp = {
     $app : app
 }
 console.info(loginApp)
-console.info(loginApp.doLogin())
+
+// 测试在不同地方import一个ts后内部的变量的关系
+// import router from './src/system.router.ts'
+// router.replace({ name: 'test'})
+// console.info(loginApp.doLogin())
+loginApp.doLogin()
+
