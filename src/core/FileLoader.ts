@@ -1,5 +1,7 @@
-const MIDDLE_JS_OUTPUT_PATH = './intermediate/js/src/'
-const SOURCE_ROOT_PATH = '../src/'
+
+const CODE_PATH = 'src/'
+const MIDDLE_JS_OUTPUT_PATH = './intermediate/js/' + CODE_PATH
+const SOURCE_ROOT_PATH = '../' + CODE_PATH
 
 import ManifestLoader from './ManifestLoader.ts'
 import {readTag} from './TagReader.ts'
