@@ -1,4 +1,4 @@
-const MIDDLE_JS_OUTPUT_PATH = './intermediate/js/'
+const MIDDLE_JS_OUTPUT_PATH = './intermediate/js/src/'
 const SOURCE_ROOT_PATH = '../src/'
 
 import ManifestLoader from './ManifestLoader.ts'
@@ -33,32 +33,38 @@ export class FileLoader {
         return this.load(realPagePath)
     }
 
-    loadUx(content:string,path:string) {
+    /**
+     * 
+     * @param content ux file content
+     * @param path 
+     */
+    loadUx(path:string) {
         console.info("FileLoader loadUx", path)
         //1 get script content or src attr 
         let realPath = SOURCE_ROOT_PATH + path
         let tag = readTag('script', realPath)
         console.info(tag,realPath)
-        let conetnt = ''
+        let content = ''
         let targetJsFilePath = ''
         if (tag.content !== '') {
             content = tag.content
+            targetJsFilePath = this.getDirPathFromFilePath(path) + 'index.js' 
         } else if (tag.params.src) {
             let dirPath = this.getDirPathFromFilePath(realPath)
             content = this.decoder.decode(Deno.readFileSync(
                 dirPath + tag.params.src
             ))
-            targetJsFilePath = MIDDLE_JS_OUTPUT_PATH + this.getDirPathFromFilePath(path) + tag.params.src 
+            targetJsFilePath = this.getDirPathFromFilePath(path) + tag.params.src 
         } else {
             console.error("FileLoader loadUx", 'fail')
         }
 
         Deno.mkdirSync(MIDDLE_JS_OUTPUT_PATH +  this.getDirPathFromFilePath(path), { recursive: true})
-        console.info(targetJsFilePath)
-        Deno.writeFileSync(targetJsFilePath, this.encoder.encode(content))
+        Deno.writeFileSync(MIDDLE_JS_OUTPUT_PATH + targetJsFilePath, this.encoder.encode(content))
+
         return {
             content: content,
-            path: this.getDirPathFromFilePath(path) + tag.params.src 
+            relativePath: targetJsFilePath
         }
     }
 
@@ -73,10 +79,10 @@ export class FileLoader {
         //2,3 in loadContent function
         // if is js file
         let res:any 
-        if (path.includes('.js')) {
+        console.info('FileLoader load', 'try write to ' + path)
+            if (path.includes('.js')) {
             res = this.loadContent(content, path)
             
-            console.info('FileLoader load', 'try write to ' + path)
             Deno.mkdirSync(MIDDLE_JS_OUTPUT_PATH + this.getDirPathFromFilePath(path), { recursive: true})
             Deno.writeFileSync(MIDDLE_JS_OUTPUT_PATH + path ,
                 this.encoder.encode(res.content))
@@ -87,15 +93,21 @@ export class FileLoader {
         } else {
         // else if is ux file 
             
-            console.info('FileLoader load', 'try write to ' + path)
+        // 1 copy ux file to intermediate
             Deno.mkdirSync(MIDDLE_JS_OUTPUT_PATH + this.getDirPathFromFilePath(path), { recursive: true})
-          
-            res = this.loadUx(content, path)
-            console.info(this.getDirPathFromFilePath(res.path))
+            Deno.writeFileSync(MIDDLE_JS_OUTPUT_PATH + path ,
+                this.encoder.encode(content))
+
+        // 2 load ux file
+            res = this.loadUx(path)
             
-            // change path from ux to js
-            path = res.path
-            res = this.loadContent(res.content, this.getDirPathFromFilePath(res.path))
+        // 3 change path from ux to js
+            path = res.relativePath
+
+        // 4 loadContent for a js file
+            res = this.loadContent(res.content, path)
+
+        // 5 
             Deno.writeFileSync(MIDDLE_JS_OUTPUT_PATH + path ,
                 this.encoder.encode(res.content))
             return {
@@ -116,7 +128,7 @@ export class FileLoader {
         improts?.forEach((imp:string) => {
             const regItem = /import +.*? from +(.*);?/
             let res = regItem.exec(imp)
-            console.info('FileLoader load mport:[' + imp+ ']')//,regImport, res)
+            console.info('FileLoader load mport:[' + imp+ ']',path)//,regImport, res)
             if (res &&res?.length > 1) {
                 let regTarget = res[1] 
                 if (regTarget.startsWith('\'@system')
@@ -151,7 +163,8 @@ export class FileLoader {
 
     loadOtherModule(importStatement:string, target:string,currentFilePath:string, content:string) {
         console.info('FileLoader loadOtherModule')
-        console.info(importStatement, target, currentFilePath)
+        console.info(importStatement, target )
+        console.info('currentFilePath', currentFilePath)
         // 去除前后符号
         target = target.replace(/\'/g, '').replace(/\"/g,'')
         //TODO 这样写不太好 逻辑不是很顺
