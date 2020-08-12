@@ -12,7 +12,7 @@
 
 import {FileLoader} from './core/FileLoader.ts'
 let count = 0
-let pageStack = []
+let pageStack:any[] = []
 let pageMap = {}
 
 /**
@@ -20,23 +20,42 @@ let pageMap = {}
  * @param obj 
  */
 
-const replace = (obj:any) => {
-    console.info('router.replace',obj, ++count)
+const replace = async (obj:any) => {
+    console.info('ROUTER.replace',obj, ++count)
     
     let result = FileLoader.getInstance().loadRoute(obj.uri)
+    let p = '../' + result.path
+    let module = await import(p)
+    
+    console.info('ROUTER replace import', p)
+    let appPage = module.default 
+
+    pageStack.pop()
+    pageStack.push(appPage)
+    pageStack.forEach((i:any) => {
+        console.info(i)
+    })
+    console.info('ROUTER replace end')
+    return appPage
 }
 
 const push = async (obj:any) => {
     console.info("ROUTER push",obj)
     let uri = obj.uri 
 
-    let result = FileLoader.getInstance().load(uri)
+    let result = FileLoader.getInstance().loadRoute(uri)
     
-    console.info('load')
-    let module = await import(result.path)
+    let p = '../' + result.path
+    let module = await import(p)
     
+    console.info('ROUTER push import', p)
     let appPage = module.default 
+
     pageStack.push(appPage)
+    pageStack.forEach((i:any) => {
+        console.info(i)
+    })
+    console.info('ROUTER push end')
     return appPage
 }
 

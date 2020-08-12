@@ -1,4 +1,4 @@
-const MIDDLE_JS_OUTPUT_PATH = '../intermediate/js/'
+const MIDDLE_JS_OUTPUT_PATH = './intermediate/js/'
 const SOURCE_ROOT_PATH = '../src/'
 
 import ManifestLoader from './ManifestLoader.ts'
@@ -30,7 +30,7 @@ export class FileLoader {
         // 2 load ux 
         let realPagePath = route + '/' + routerPage + '.ux'
         console.info('result', route + '/' + routerPage)
-        this.load(realPagePath)
+        return this.load(realPagePath)
     }
 
     loadUx(content:string,path:string) {
@@ -38,8 +38,9 @@ export class FileLoader {
         //1 get script content or src attr 
         let realPath = SOURCE_ROOT_PATH + path
         let tag = readTag('script', realPath)
-        console.info(tag)
+        console.info(tag,realPath)
         let conetnt = ''
+        let targetJsFilePath = ''
         if (tag.content !== '') {
             content = tag.content
         } else if (tag.params.src) {
@@ -47,12 +48,17 @@ export class FileLoader {
             content = this.decoder.decode(Deno.readFileSync(
                 dirPath + tag.params.src
             ))
-            console.info(content)
+            targetJsFilePath = MIDDLE_JS_OUTPUT_PATH + this.getDirPathFromFilePath(path) + tag.params.src 
         } else {
             console.error("FileLoader loadUx", 'fail')
         }
+
+        Deno.mkdirSync(MIDDLE_JS_OUTPUT_PATH +  this.getDirPathFromFilePath(path), { recursive: true})
+        console.info(targetJsFilePath)
+        Deno.writeFileSync(targetJsFilePath, this.encoder.encode(content))
         return {
-            content: content
+            content: content,
+            path: this.getDirPathFromFilePath(path) + tag.params.src 
         }
     }
 
@@ -61,7 +67,7 @@ export class FileLoader {
         //0 find target file from source dir
         let loadPath = SOURCE_ROOT_PATH + path 
         
-        console.info('FileLoader laod', 'try load file:' + loadPath)
+        console.info('FileLoader load', 'try load file: ' + loadPath)
         //1 load file content
         let content = new TextDecoder('utf-8').decode(Deno.readFileSync(loadPath))
         //2,3 in loadContent function
@@ -69,24 +75,41 @@ export class FileLoader {
         let res:any 
         if (path.includes('.js')) {
             res = this.loadContent(content, path)
+            
+            console.info('FileLoader load', 'try write to ' + path)
+            Deno.mkdirSync(MIDDLE_JS_OUTPUT_PATH + this.getDirPathFromFilePath(path), { recursive: true})
+            Deno.writeFileSync(MIDDLE_JS_OUTPUT_PATH + path ,
+                this.encoder.encode(res.content))
+            return {
+                content: res.content,
+                path:MIDDLE_JS_OUTPUT_PATH + path
+            }
         } else {
         // else if is ux file 
+            
+            console.info('FileLoader load', 'try write to ' + path)
+            Deno.mkdirSync(MIDDLE_JS_OUTPUT_PATH + this.getDirPathFromFilePath(path), { recursive: true})
+          
             res = this.loadUx(content, path)
+            console.info(this.getDirPathFromFilePath(res.path))
+            
+            // change path from ux to js
+            path = res.path
+            res = this.loadContent(res.content, this.getDirPathFromFilePath(res.path))
+            Deno.writeFileSync(MIDDLE_JS_OUTPUT_PATH + path ,
+                this.encoder.encode(res.content))
+            return {
+                content: res.content,
+                path:MIDDLE_JS_OUTPUT_PATH + path
+            }
         }
         
-        console.info('FileLoader load', 'try write to ' + path)
         
         
-        Deno.mkdirSync(MIDDLE_JS_OUTPUT_PATH + this.getDirPathFromFilePath(path), { recursive: true})
-        Deno.writeFileSync(MIDDLE_JS_OUTPUT_PATH + path ,
-            this.encoder.encode(res.content))
-        return {
-            content: res.content,
-            path:MIDDLE_JS_OUTPUT_PATH + path
-        }
     }
 
     loadContent(content: string, path:string) {
+        console.info('FileLoader loadContent', path)
         //2 load imports 
         const regImport =  /import +.*? from +(.*);?/g
         let improts = content.match(regImport)
