@@ -1,10 +1,11 @@
 
+import ManifestLoader from './ManifestLoader.ts'
+import {readTag} from './TagReader.ts'
+
 const CODE_PATH = 'src/'
 const MIDDLE_JS_OUTPUT_PATH = './intermediate/js/' + CODE_PATH
 const SOURCE_ROOT_PATH = '../' + CODE_PATH
 
-import ManifestLoader from './ManifestLoader.ts'
-import {readTag} from './TagReader.ts'
 
 let sInstance:FileLoader|null = null
 export class FileLoader {
@@ -117,16 +118,20 @@ export class FileLoader {
                 path:MIDDLE_JS_OUTPUT_PATH + path
             }
         }
-        
-        
-        
     }
 
     loadContent(content: string, path:string) {
         console.info('FileLoader loadContent', path)
+        // 
+        const regComment = /\/\/.*?(\n|\r|\r\n)/g
+        let improts = content.match(regComment)
+        improts?.forEach((imp:string) => {
+            // console.info(imp)
+            content = content.replace(imp,'')
+        })
         //2 load imports 
         const regImport =  /import +.*? from +(.*);?/g
-        let improts = content.match(regImport)
+        improts = content.match(regImport)
         improts?.forEach((imp:string) => {
             const regItem = /import +.*? from +(.*);?/
             let res = regItem.exec(imp)
@@ -146,11 +151,26 @@ export class FileLoader {
              console.info(res, res?.length)
             }
         })
+
+        
+        //import "./appStatistics.min.js"
+        //2.0 some other example
+        const regImport2 = /import +('|")(.*)('|")/g
+        improts = content.match(regImport2)
+        improts?.forEach((imp:string) => {
+            const regItem2 = /import +('|")(.*)('|")/
+            console.info("FileLoader load import:[" + imp + "]", path)
+            let res = regItem2.exec(imp)
+            if (res && res.length > 3) {
+                let regTarget = res[2]
+                content = this.loadOtherModule(imp, regTarget, path, content)
+            }
+        })
+
         //2.1 get imports 
 
 
         //3 load  as module
-
         return {
             content: content
         }
@@ -188,7 +208,12 @@ export class FileLoader {
         // 1.1 make sure target file parent dir is exist
         this.makeSureDir(info.targetFileDirPath) 
         // console.info()
-        let targetFileRealPath = SOURCE_ROOT_PATH + info.currentFileDirPath +  info.targetFilePath + '.js'
+        let targetFileRealPath = SOURCE_ROOT_PATH + info.currentFileDirPath +  info.targetFilePath
+        
+        if (!targetFileRealPath.endsWith('.js') ) {
+            targetFileRealPath += '.js'
+        }
+
         let targetFileContent = this.decoder.decode(Deno.readFileSync(targetFileRealPath))
         // console.info("FileLoader loadOtherModule content:\n\n" + targetFileContent,'\n\n')
         let res = this.loadContent(targetFileContent, targetFileRealPath)
@@ -196,8 +221,6 @@ export class FileLoader {
         // 1.2 load and write target file to out dir
         Deno.writeFileSync(MIDDLE_JS_OUTPUT_PATH + info.currentFileDirPath +  info.targetFilePath + '.js',
         this.encoder.encode(targetFileContent))
-
-        // 
 
         return content
     }
