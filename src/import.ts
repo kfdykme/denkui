@@ -1,1 +1,1 @@
-// import A from './intermediate/app.js';console.info(A);
+// import A from './intermediate/app.js';logger.info(A);

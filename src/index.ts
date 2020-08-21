@@ -23,28 +23,28 @@ let pages = {}
 
 let loadPage = async (routeName:string, route:any) => {
     let path = routeName + '/' + route.component
-    console.info(SOURCE_ROOT_PATH + path + FILE_TYPE_UX)
+    logger.info(SOURCE_ROOT_PATH + path + FILE_TYPE_UX)
     let page = fileReader.
     readFileSync(SOURCE_ROOT_PATH + path + FILE_TYPE_UX)
     let outJsPath = MIDDLE_JS_PATH + path + FILE_TYPE_JS
     Fs.mkdirSync(MIDDLE_JS_PATH + routeName, {recursive: true})
-    // console.info(outJsPath)
+    // logger.info(outJsPath)
     Fs.writeFileSync(outJsPath,  page.script ? page.script.content : "//empty")
    
-// console.info( page)
-    console.info(Fs.readdirSync('./'))
+// logger.info( page)
+    logger.info(Fs.readdirSync('./'))
    import(outJsPath)
    .then(module => {
-       console.info(module)
+       logger.info(module)
    }).catch(e => {
-       console.error(e)
+       logger.error(e)
    })
-    // console.info(module)
+    // logger.info(module)
     // module.default.onInit()
     // module.default.doLogin()
 }
  
-// console.info(result)
+// logger.info(result)
 // (async () => {
 //     for(let x in 
 //         manifest.router.pages) {

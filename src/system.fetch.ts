@@ -8,9 +8,11 @@
 
  // bbs 的api需要将header设置为application/x-www-form-urlencoded; 所以没定
  
+
+import logger from './log/console.ts'  
 export default {
     fetch: async (o:any)=> {
-        console.info('FETCH fetch', o)
+        logger.info('FETCH fetch', o)
 
         let params = new URLSearchParams(); 
 
@@ -28,7 +30,7 @@ export default {
         }).then(async (res) => {
             o.res = res
             
-            console.info("FETCH res", res)
+            logger.info("FETCH res", res)
 
             if (o.success) {
                 
@@ -41,7 +43,7 @@ export default {
             }
 
         }).catch((err) =>{
-            console.error('error', err)
+            logger.error('error', err)
         }).finally(() => {
             
             if (o.complete) {

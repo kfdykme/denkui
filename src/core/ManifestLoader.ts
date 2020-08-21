@@ -2,6 +2,7 @@
  * @Author: kfdykme
  */
 
+import logger from '../log/console.ts'
 const MANIFEST_FILE_NAME = 'manifest.json'
 
 export default class ManifestLoader {
@@ -18,7 +19,7 @@ export default class ManifestLoader {
             return JSON.parse(json)
 
         } catch(e) {
-            console.error('AppLoader error',e, path)
+            logger.error('AppLoader error',e, path)
             return {}
         }
     }

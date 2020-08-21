@@ -6,9 +6,10 @@
  */
 
 import TagData from '../data/TagData.ts'
+import logger from '../log/console.ts'
 
 let readTag = (tag:string, path:string,content:string = ''):TagData => {
-    console.info('TAGREADER readTag', tag, path, content)
+    logger.info('TAGREADER readTag', tag, path, content)
     if (content === '') {
         let decoder = new TextDecoder('utf-8')
         content = decoder.decode(Deno.readFileSync(path))
@@ -27,7 +28,7 @@ let readTag = (tag:string, path:string,content:string = ''):TagData => {
             return i && i.trim() != ''
         }) 
 
-        console.info(res)
+        logger.info('TAGREADER', res)
    
 
         if (res.length >= 2) {

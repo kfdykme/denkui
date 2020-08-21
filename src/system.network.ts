@@ -1,5 +1,8 @@
+
+import logger from './log/console.ts'
+
 export default {
     getType(o:any) {
-        console.info("NETWORK GETTYPE", o)
+        logger.info("NETWORK GETTYPE", o)
     }
 }

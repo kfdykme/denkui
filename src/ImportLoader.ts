@@ -18,7 +18,7 @@ export class ImportLoader {
         // for example : ../../Common/UserCache
             let targetPath = DEFAULT_SOURCE_ROOT + relativePath + this.target + '.js'
             
-            console.info('ImportLoader','load', targetPath)
+            logger.info('ImportLoader','load', targetPath)
             new ScriptFileLoader(targetPath, './intermediate/js/' +relativePath, this.target + '.js')
         }
     }
@@ -29,9 +29,9 @@ export class ScriptFileLoader {
     imports:string[]
     constructor(path:string, middlePath:string, relativePath:string) {
         middlePath = middlePath.replace('../src/','')
-        console.info('ScriptFileLoader', path, middlePath)
+        logger.info('ScriptFileLoader', path, middlePath)
         this.content = Fs.readFileSync(path) + ''
-        // console.info('middlePath',)
+        // logger.info('middlePath',)
         // Fs.mkdirSync(MIDDLE_JS_PATH + routeName, {recursive: true})
         let importReg = /import (.*) from (.*);?(\r\n|\r|\n)/g
         // this.imports = this.content.match(importReg).map((importItem: string) => {
@@ -42,8 +42,8 @@ export class ScriptFileLoader {
 
             let res = Fs.writeFileSync(middlePath + relativePath,this.content)
         } catch (e) {
-            console.error(e)
+            logger.error(e)
         }
-        console.info('ScriptFileLoader', path)
+        logger.info('ScriptFileLoader', path)
     } 
 }

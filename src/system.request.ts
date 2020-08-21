@@ -1,5 +1,7 @@
+
+import logger from './log/console.ts'
 export default {
     upload (o:any) {
-        console.info("REQUEST UPLOAD", o)
+        logger.info("REQUEST UPLOAD", o)
     }
 }

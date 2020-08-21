@@ -5,7 +5,7 @@
 import {FileLoader} from './FileLoader.ts'
 import ManifestLoader from './ManifestLoader.ts'
 import router from '../system.router.ts'
-
+import logger from '../log/console.ts'
 export class AppLoader{
     
     appPath :string = ''
@@ -14,15 +14,15 @@ export class AppLoader{
     constructor() {
         this.rootPath = Deno.cwd()
 
-        console.info("AppLoader",this.rootPath )
+        logger.info("AppLoader",this.rootPath )
         this.manifest = new ManifestLoader(this.rootPath+ "\\..\\src\\").get()
         
     }
 
     async load(appPath:string) {
         appPath = '../../' +FileLoader.getInstance().load(appPath).path
-        console.info('AppLoader load', appPath)
-        // console.info('AppLoader load', this.rootPath)
+        logger.info('AppLoader load', appPath)
+        // logger.info('AppLoader load', this.rootPath)
         let appModule = await import(appPath)
         let app = appModule.default
         let entry = this.manifest.router.entry
@@ -32,7 +32,7 @@ export class AppLoader{
                 uri: entry
             })
         }
-        console.info(app)
+        logger.info(app)
         app.hookCreate()
     }
 }

@@ -1,6 +1,8 @@
 /*
  * @Author: kfdykme
  */
+
+import logger from './log/console.ts'
 const STORAGE_PATH = '~/.denkui/storage.json'
 const docoder = new TextDecoder('utf-8')
 const encoder = new TextEncoder()
@@ -28,7 +30,7 @@ let getJson =  (o:any):any => {
     try {
         content = docoder.decode(Deno.readFileSync(STORAGE_PATH));
     } catch(e) {
-        console.info('STORAGE set', 'new sotrage init')
+        logger.info('STORAGE set', 'new sotrage init')
     }
     
     let json = JSON.parse(content)

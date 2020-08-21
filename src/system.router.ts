@@ -10,6 +10,7 @@
  * |- replace
  */
 
+import logger from './log/console.ts'
 import {FileLoader} from './core/FileLoader.ts'
 let count = 0
 let pageStack:any[] = []
@@ -21,21 +22,21 @@ let pageMap = {}
  */
 
 const replace = async (obj:any) => {
-    console.info('ROUTER.replace',obj, ++count)
+    logger.info('ROUTER.replace',obj, ++count)
     
     let result = FileLoader.getInstance().loadRoute(obj.uri)
     let p = '../' + result.path
     let module = await import(p)
     
-    console.info('ROUTER replace import', p)
+    logger.info('ROUTER replace import', p)
     let appPage = module.default 
 
     pageStack.pop()
     addPageIntoStakc(appPage)
-    pageStack.forEach((i:any) => {
-        console.info(i)
-    })
-    console.info('ROUTER replace end')
+    // pageStack.forEach((i:any) => {
+    //     logger.info(i)
+    // })
+    logger.info('ROUTER replace end')
     return appPage
 }
 
@@ -45,7 +46,7 @@ const addPageIntoStakc = (page:any) => {
 }
 
 const push = async (obj:any) => {
-    console.info("ROUTER push",obj)
+    logger.info("ROUTER push",obj)
     let uri = obj.uri 
 
     let result = FileLoader.getInstance().loadRoute(uri)
@@ -53,14 +54,14 @@ const push = async (obj:any) => {
     let p = '../' + result.path
     let module = await import(p)
     
-    console.info('ROUTER push import', p)
+    logger.info('ROUTER push import', p)
     let appPage = module.default 
 
     addPageIntoStakc(appPage)
     pageStack.forEach((i:any) => {
-        console.info(i)
+        logger.info(i)
     })
-    console.info('ROUTER push end')
+    logger.info('ROUTER push end')
     return appPage
 }
 
