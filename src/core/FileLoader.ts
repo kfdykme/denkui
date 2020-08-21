@@ -122,9 +122,16 @@ export class FileLoader {
 
     loadContent(content: string, path:string) {
         console.info('FileLoader loadContent', path)
-        // 
+        // 0 remove moduls can't run in deno
+        const regDenoFilter = /\/\/startDeno((\r|\n|\r\n)(.*))*?\/\/endDeno/
+
+        let improts = content.match(regDenoFilter)
+        improts?.forEach((imp:string) => {
+            content = content.replace(imp,'')
+        })
+        // 1 filter comments 
         const regComment = /\/\/.*?(\n|\r|\r\n)/g
-        let improts = content.match(regComment)
+        improts = content.match(regComment)
         improts?.forEach((imp:string) => {
             // console.info(imp)
             content = content.replace(imp,'')
