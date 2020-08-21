@@ -33,7 +33,8 @@ export default {
             if (o.success) {
                 
                 let data = {
-                    data:JSON.stringify(await res.json())
+                    // data:JSON.stringify(await res.json())
+                    data: await res.text()
                 }
 
                 o.success(data)

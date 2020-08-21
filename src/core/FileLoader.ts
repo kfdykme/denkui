@@ -130,7 +130,7 @@ export class FileLoader {
             content = content.replace(imp,'')
         })
         // 1 filter comments 
-        const regComment = /\/\/.*?(\n|\r|\r\n)/g
+        const regComment = / \/\/.*?(\n|\r|\r\n)/g
         improts = content.match(regComment)
         improts?.forEach((imp:string) => {
             // console.info(imp)
@@ -187,7 +187,7 @@ export class FileLoader {
         // fetch.ts
         console.info("FileLoader load loadSystemModule")
         target =target.substring(0,target.length-1)
-       return content.replace(importStatement,importStatement.replace(target,target.replace('@system','file:///C:/Users/wimkf/wor/bbs-quick/denkui/src/system') + '.ts'))
+       return content.replace(importStatement,importStatement.replace(target,target.replace('@system','file:///' +Deno.cwd().replace(/\\/g,'/') +'/src/system') + '.ts'))
     }
 
     loadOtherModule(importStatement:string, target:string,currentFilePath:string, content:string) {

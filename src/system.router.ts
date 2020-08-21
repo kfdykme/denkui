@@ -31,12 +31,17 @@ const replace = async (obj:any) => {
     let appPage = module.default 
 
     pageStack.pop()
-    pageStack.push(appPage)
+    addPageIntoStakc(appPage)
     pageStack.forEach((i:any) => {
         console.info(i)
     })
     console.info('ROUTER replace end')
     return appPage
+}
+
+const addPageIntoStakc = (page:any) => {
+    pageStack.push(page)
+    page.onInit()
 }
 
 const push = async (obj:any) => {
@@ -51,7 +56,7 @@ const push = async (obj:any) => {
     console.info('ROUTER push import', p)
     let appPage = module.default 
 
-    pageStack.push(appPage)
+    addPageIntoStakc(appPage)
     pageStack.forEach((i:any) => {
         console.info(i)
     })

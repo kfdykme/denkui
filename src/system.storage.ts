@@ -38,7 +38,9 @@ let getJson =  (o:any):any => {
 let get = (o:any) => {
     let key:string = o.key 
     let json = getJson(o)
-    return json[key]
+    return new Promise((reslove, rejcet) => {
+        reslove(json)
+    })
 }
 
 export default {

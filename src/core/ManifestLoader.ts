@@ -12,7 +12,14 @@ export default class ManifestLoader {
 
     get():any {
         let decoder = new TextDecoder('utf-8')
-        let json = decoder.decode(Deno.readFileSync(this.rootPath + MANIFEST_FILE_NAME))
-        return JSON.parse(json)
+        let path = this.rootPath + MANIFEST_FILE_NAME
+        try {
+            let json = decoder.decode(Deno.readFileSync(path))
+            return JSON.parse(json)
+
+        } catch(e) {
+            console.error('AppLoader error',e, path)
+            return {}
+        }
     }
 }
