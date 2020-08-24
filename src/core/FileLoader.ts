@@ -5,7 +5,7 @@ import logger from '../log/console.ts'
 
 const CODE_PATH = 'src/'
 const MIDDLE_JS_OUTPUT_PATH = './intermediate/js/' + CODE_PATH
-const SOURCE_ROOT_PATH = '../' + CODE_PATH
+const SOURCE_ROOT_PATH = '../bbs-quick/' + CODE_PATH
 
 
 let sInstance:FileLoader|null = null

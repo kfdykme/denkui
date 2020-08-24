@@ -17,7 +17,7 @@ export class AppLoader{
         this.rootPath = Deno.cwd()
 
         logger.info("AppLoader",this.rootPath )
-        this.manifest = new ManifestLoader(this.rootPath+ "\\..\\src\\").get()
+        this.manifest = new ManifestLoader(this.rootPath+ "\\..\\bbs-quick\\src\\").get()
         router.init(this)
     }
 

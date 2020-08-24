@@ -1,7 +1,8 @@
 
 const filters:string[] = [
     'FileLoader', 
-    'TAGREADER'
+    'TAGREADER',
+    "TagData"
 ]
 
 const isFilted = (...vars:any[]) => {
