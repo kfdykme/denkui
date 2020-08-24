@@ -17,7 +17,16 @@
 - 暂时的想法是这样
 
 
+
+
 ### TODO
+
+- view树
+- css渲染树
+- 合并
+- view 与 deno的交互
+- 生命周期保证
+
 TODO MODULE | TODO TASK | TASK STAUS 
 --- | --- | --- | 
 Part 1 : Trans from quickapp to Deno Code | Load From Manifest | -

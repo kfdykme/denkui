@@ -12,9 +12,11 @@
 
 import logger from './log/console.ts'
 import {FileLoader} from './core/FileLoader.ts'
+import {AppLoader} from './core/AppLoader.ts'
 let count = 0
 let pageStack:any[] = []
-let pageMap = {}
+let pageMap = {};
+let app : AppLoader;
 
 /**
  * replace
@@ -43,6 +45,10 @@ const replace = async (obj:any) => {
 const addPageIntoStakc = (page:any) => {
     pageStack.push(page)
     page.onInit()
+    app.currentPage = {
+        ...page,
+    ...page.protected}
+    app.currentPage.$app = app.app
 }
 
 const push = async (obj:any) => {
@@ -65,7 +71,12 @@ const push = async (obj:any) => {
     return appPage
 }
 
+const init = (obj:AppLoader) => {
+    app = obj
+}
+
 export default {
     replace,
-    push
+    push,
+    init
 }

@@ -11,12 +11,14 @@ export class AppLoader{
     appPath :string = ''
     rootPath : string = ''
     manifest :any 
+    currentPage: any
+    app:any
     constructor() {
         this.rootPath = Deno.cwd()
 
         logger.info("AppLoader",this.rootPath )
         this.manifest = new ManifestLoader(this.rootPath+ "\\..\\src\\").get()
-        
+        router.init(this)
     }
 
     async load(appPath:string) {
@@ -24,15 +26,15 @@ export class AppLoader{
         logger.info('AppLoader load', appPath)
         // logger.info('AppLoader load', this.rootPath)
         let appModule = await import(appPath)
-        let app = appModule.default
+        this.app = appModule.default
         let entry = this.manifest.router.entry
-        app.hookCreate = () => {
-            app.onCreate()
+        this.app.hookCreate = () => {
+            this.app.onCreate()
             router.push({
                 uri: entry
             })
         }
-        logger.info(app)
-        app.hookCreate()
+        logger.info(this.app)
+        this.app.hookCreate()
     }
 }

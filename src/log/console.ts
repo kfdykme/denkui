@@ -1,5 +1,5 @@
 
-const filters = [
+const filters:string[] = [
     'FileLoader', 
     'TAGREADER'
 ]
@@ -18,14 +18,14 @@ const isFilted = (...vars:any[]) => {
 export default  {
     info: (...vars: any[]) => {
         if(isFilted(vars)) return 
-        console.info(vars[0])
+        console.info(...vars)
     },
     error:(...vars: any[]) => {
         if(isFilted(vars)) return
-        console.error(vars[0])
+        console.error(...vars)
     },
     log:(...vars: any[]) => {
         if(isFilted(vars)) return
-        console.log(vars[0])
+        console.log(...vars)
     }
 }
