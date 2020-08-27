@@ -24,58 +24,50 @@ export default class TagParser {
         return 'no template element'
     }
 
+    createNode(name:string):any {
+        return  [
+            name
+        ]
+    }
+
     readTag(content:string):any {
-        let pos = -1
-        let status = STATUS_WAIT_TAG_START
+        let stack:any[] = [] 
+        let tagStartReg = /\<(.*)/
+        let tagEndReg = /\<\/(.*)/
+        let lineTagReg = /\<(.*)?\>.*?\<\/.*?\>/
 
-        let tagStartPos = -1
-        let tagEndPos = -1
-        let tag = ''
+        let root:any[] = [
+            'root'
+        ]
 
-        let contentStartPos = 0
-        let tagContent = ''
-        let c 
-        while(++pos + (tag.length + 3)< content.length) {
-            c = content.charAt(pos)
-            if (c === '<' && 
-            status === STATUS_WAIT_TAG_START) {
-                status = STATUS_TAG_START
-                tagStartPos = pos
-            }
+        stack.push(root)
+        let cur:any[] =stack[stack.length-1]
 
-            if (status === STATUS_TAG_START ||
-                status === STATUS_TAG_PARAM_START) {
-                if (c === ' ') {
-                    status = STATUS_TAG_PARAM_START
-                }
+        let lineArray = content.split(/(\r|\n|\r\n)/g)
+        .map(i => {
+            return i.replace(/\<\!--.*?--\>/,'').trim()
+        })
+        .filter(i => {
+            return i !== '' && i !== '\n'
+        })
+        .forEach(i => {
+            if (lineTagReg.test(i)) {
+                console.info('line', i)
+                
+            } else if (tagEndReg.test(i)) {
+                console.info('pop', i)
+                cur = stack.pop()
 
-                if (c === '>') {
-                    status = STATUS_TAG_END
-                }
-            }
+            } else if (tagStartReg.test(i)) {
+                console.info('push', i)
+                let n = this.createNode(i)
+                stack.push(n)
+                cur.push(n)
+                cur = cur[cur.length-1]
+            }   
+        })
+        
 
-            if (status === STATUS_TAG_END) {
-                status = STATUS_CONTENT_START
-                tagEndPos = pos
-                tag = content.substring(tagStartPos+1, tagEndPos)
-            }
-
-            if (status === STATUS_CONTENT_START) {
-                contentStartPos = pos
-                status = STATUS_CONTENT_WAIT_END
-            }
-        }
-
-        tagContent = content.substring(contentStartPos +1, pos)
-        let childs:any[] = []
-        console.info(status)
-        if (status !== STATUS_WAIT_TAG_START) {
-            // childs = this.readTag(content)
-        }
-        return {
-            name: tag,
-            content: tagContent,
-            childs
-        }
+        return root
     }
 }
