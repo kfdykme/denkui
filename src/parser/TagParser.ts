@@ -1,5 +1,5 @@
 import { View } from "../data/View.ts" 
-
+import logger from '../log/console.ts'
 const STATUS_WAIT_TAG_START = 1
 const STATUS_TAG_START = 2
 const STATUS_TAG_PARAM_START = 3
@@ -36,7 +36,7 @@ export default class TagParser {
     }
 
     pushNode(node:any) {
-        // console.info('push', node)
+        logger.info('TagParser push', node) 
         this.stack.push(node) 
         this.cur.childs.push(node)
         this.cur = this.cur.childs[this.cur.childs.length - 1]
@@ -45,7 +45,7 @@ export default class TagParser {
     popNode() {
         this.stack.pop()
         this.cur = this.stack[this.stack.length -1]
-        // console.info('pop', this.cur)
+        logger.info('TagParser pop, current is : ', this.cur)
     }
 
     addToCurrentNode(s:string) { 
