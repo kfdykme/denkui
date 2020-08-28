@@ -16,7 +16,7 @@ export default class TagParser {
     stack:View[] = []
     cur:View
     constructor() {
-        this.cur = this.createNode('view')
+        this.cur = this.createNode('<view>')
     }
 
     in(fileContent:string) {
@@ -48,8 +48,8 @@ export default class TagParser {
         // console.info('pop', this.cur)
     }
 
-    addToCurrentNode(s:string) {
-        this.cur.name = `${this.cur.name}\n${s}`
+    addToCurrentNode(s:string) { 
+        this.cur.addContent(s)
     }
 
     readTag(content:string):any {  
@@ -82,7 +82,9 @@ export default class TagParser {
             }
         })
         
+        this.cur.build()
 
+        // return ''
         return this.cur.toString()
     }
 }
