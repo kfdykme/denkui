@@ -2,6 +2,7 @@
 import ManifestLoader from './ManifestLoader.ts'
 import {readTag} from './TagReader.ts'
 import logger from '../log/console.ts'
+import TagParser from '../parser/TagParser.ts'
 
 const CODE_PATH = 'src/'
 const MIDDLE_JS_OUTPUT_PATH = './intermediate/js/' + CODE_PATH
@@ -105,6 +106,8 @@ export class FileLoader {
         // 2 load ux file
             res = this.loadUx(path)
             
+        //parser tempalte 
+            let view = TagParser.getInstance().path(loadPath)
         // 3 change path from ux to js
             path = res.relativePath
 
@@ -115,6 +118,7 @@ export class FileLoader {
             Deno.writeFileSync(MIDDLE_JS_OUTPUT_PATH + path ,
                 this.encoder.encode(res.content))
             return {
+                view,
                 content: res.content,
                 path:MIDDLE_JS_OUTPUT_PATH + path
             }
