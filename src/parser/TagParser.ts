@@ -1,3 +1,4 @@
+import { View } from "../data/View.ts" 
 
 const STATUS_WAIT_TAG_START = 1
 const STATUS_TAG_START = 2
@@ -12,9 +13,10 @@ let lineTagReg = /(\<(.+)?\/\>)|(\<(.+)?\>.*?\<\/(.*))/
 
 export default class TagParser {
 
-    stack:any[] = []
-    cur:any[] = []
+    stack:View[] = []
+    cur:View
     constructor() {
+        this.cur = this.createNode('view')
     }
 
     in(fileContent:string) {
@@ -29,17 +31,15 @@ export default class TagParser {
         return 'no template element'
     }
 
-    createNode(name:string):any[] {
-        return  [
-            name
-        ]
+    createNode(name:string):View {
+        return  new View(name)
     }
 
     pushNode(node:any) {
         // console.info('push', node)
         this.stack.push(node) 
-        this.cur.push(node)
-        this.cur = this.cur[this.cur.length-1]
+        this.cur.childs.push(node)
+        this.cur = this.cur.childs[this.cur.childs.length - 1]
     }
 
     popNode() {
@@ -49,14 +49,13 @@ export default class TagParser {
     }
 
     addToCurrentNode(s:string) {
-        this.cur[0] = `${this.cur[0]}\n${s}`
+        this.cur.name = `${this.cur.name}\n${s}`
     }
 
-    readTag(content:string):any { 
-        let root:any[] = this.createNode('view')
+    readTag(content:string):any {  
 
-        this.stack.push(root)
-        this.cur = this.stack[this.stack.length-1]
+        this.stack.push(this.cur)
+
  
         content.split(/(\r|\n|\r\n)/g).map(i => { 
             return i.replace(/\<\!--.*?--\>/,'').trim()
@@ -84,6 +83,6 @@ export default class TagParser {
         })
         
 
-        return root
+        return this.cur.toString()
     }
 }
