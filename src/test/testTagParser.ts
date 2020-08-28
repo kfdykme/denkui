@@ -7,7 +7,7 @@ let textDecoder = new TextDecoder('utf-8')
 
 let templateFilePath = './res/Slash.ux'
 let testFilePath = [
-    // templateFilePath,
+    templateFilePath,
     './res/Login.ux'
 ]
 

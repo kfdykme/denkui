@@ -27,7 +27,7 @@ export class View {
         let res:any = nameReg.exec(this.name)
         let template = this.name
         this.name = res ? res[1] : ''
-        this.content = template.substring(this.name.length+2) 
+        this.content = template.substring(this.name.length) 
 
         // 如果是单行的view
         let paramReg = /[a-z]+=\".*?\"/g
@@ -40,6 +40,8 @@ export class View {
         this.params.forEach((value, key) => {
             this.jsonParams[key] = value
         }) 
+        
+        console.info( this.content,this.content.match(contentReg))
         res = this.content.match(contentReg)
         this.content = res ? res[1] : '' 
         this.childs.forEach((child:View) => {
