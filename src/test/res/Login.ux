@@ -1,0 +1,41 @@
+<template>
+  <!-- template里只能有一个根节点 -->
+  <div class="login-page">
+
+
+    <text class="text-welcome">{{welcome}}</text>
+
+
+    <input
+    class="input"
+    id="username-input"
+    placeholder="请输入用户名"
+    onchange="onUserNameChange"
+    value="{{username}}"/>
+
+    <input
+    class="input"
+    type="password"
+    id="password-input"
+    placeholder="请输入密码"
+    onchange="onPasswordChange"
+    value="{{password}}"/>
+
+
+    <input class="btn-color btn" type="button" value="{{login}}" onclick="doLogin" />
+
+    <input class="btn" type="button" value="{{register}}" onclick="doRegister" />
+
+
+
+
+  </div>
+</template>
+
+<style src="./login.css">
+
+</style>
+
+<script src="./login.js">
+
+</script>

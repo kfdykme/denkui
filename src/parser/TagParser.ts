@@ -6,10 +6,15 @@ const STATUS_TAG_END = 4
 const STATUS_CONTENT_START = 5
 const STATUS_CONTENT_WAIT_END = 6
 
+let tagStartReg = /\<(.*)/
+let tagEndReg = /(\<\/(.*))/ 
+let lineTagReg = /(\<(.+)?\/\>)|(\<(.+)?\>.*?\<\/(.*))/ 
+
 export default class TagParser {
 
+    stack:any[] = []
+    cur:any[] = []
     constructor() {
-
     }
 
     in(fileContent:string) {
@@ -24,27 +29,36 @@ export default class TagParser {
         return 'no template element'
     }
 
-    createNode(name:string):any {
+    createNode(name:string):any[] {
         return  [
             name
         ]
     }
 
-    readTag(content:string):any {
-        let stack:any[] = [] 
-        let tagStartReg = /\<(.*)/
-        let tagEndReg = /\<\/(.*)/
-        let lineTagReg = /\<(.*)?\>.*?\<\/.*?\>/
+    pushNode(node:any) {
+        // console.info('push', node)
+        this.stack.push(node) 
+        this.cur.push(node)
+        this.cur = this.cur[this.cur.length-1]
+    }
 
-        let root:any[] = [
-            'root'
-        ]
+    popNode() {
+        this.stack.pop()
+        this.cur = this.stack[this.stack.length -1]
+        // console.info('pop', this.cur)
+    }
 
-        stack.push(root)
-        let cur:any[] =stack[stack.length-1]
+    addToCurrentNode(s:string) {
+        this.cur[0] = `${this.cur[0]}\n${s}`
+    }
 
-        let lineArray = content.split(/(\r|\n|\r\n)/g)
-        .map(i => {
+    readTag(content:string):any { 
+        let root:any[] = this.createNode('view')
+
+        this.stack.push(root)
+        this.cur = this.stack[this.stack.length-1]
+ 
+        content.split(/(\r|\n|\r\n)/g).map(i => { 
             return i.replace(/\<\!--.*?--\>/,'').trim()
         })
         .filter(i => {
@@ -52,19 +66,21 @@ export default class TagParser {
         })
         .forEach(i => {
             if (lineTagReg.test(i)) {
-                console.info('line', i)
-                
-            } else if (tagEndReg.test(i)) {
-                console.info('pop', i)
-                cur = stack.pop()
-
-            } else if (tagStartReg.test(i)) {
-                console.info('push', i)
+                // console.info('line', i)
                 let n = this.createNode(i)
-                stack.push(n)
-                cur.push(n)
-                cur = cur[cur.length-1]
-            }   
+                this.pushNode(n)
+                this.popNode()
+            } else if (tagEndReg.test(i)) {
+                this.popNode()
+            } else if (tagStartReg.test(i)) {
+                let n = this.createNode(i)
+                this.pushNode(n)
+            } else {
+                this.addToCurrentNode(i)
+                if (/\/\>/.test(i)) {
+                    this.popNode()
+                }
+            }
         })
         
 

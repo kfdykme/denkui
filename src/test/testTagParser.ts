@@ -1,14 +1,19 @@
-import TagParser from '../parser/TagParser.ts'
-console.info(TagParser)
+import TagParser from '../parser/TagParser.ts' 
 
 let parser = new TagParser()
  
 
 let textDecoder = new TextDecoder('utf-8')
 
-let templateFilePath = './res/index.ux'
+let templateFilePath = './res/Slash.ux'
+let testFilePath = [
+    // templateFilePath,
+    './res/Login.ux'
+]
 
 
-let res = parser.in(textDecoder.decode(Deno.readFileSync(templateFilePath)))
-
-console.info(res )
+testFilePath.forEach(i => {
+    let res = parser.in(textDecoder.decode(Deno.readFileSync(i)))
+    
+    console.info(res)
+})
