@@ -41,7 +41,7 @@ export class View {
             this.jsonParams[key] = value
         }) 
         
-        console.info( this.content,this.content.match(contentReg))
+        // console.info( this.content,this.content.match(contentReg))
         res = this.content.match(contentReg)
         this.content = res ? res[1] : '' 
         this.childs.forEach((child:View) => {

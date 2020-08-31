@@ -3,6 +3,7 @@ const filters:string[] = [
     'FileLoader', 
     'TAGREADER',
     "TagParser",
+    "ManifestLoader",
     "TagData"
 ]
 

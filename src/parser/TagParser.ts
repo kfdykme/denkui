@@ -11,12 +11,29 @@ let tagStartReg = /\<(.*)/
 let tagEndReg = /(\<\/(.*))/ 
 let lineTagReg = /(\<(.+)?\/\>)|(\<(.+)?\>.*?\<\/(.*))/ 
 
+let textDecoder = new TextDecoder('utf-8');
+
+let sInstance:TagParser|null = null
 export default class TagParser {
 
     stack:View[] = []
     cur:View
     constructor() {
         this.cur = this.createNode('<view>')
+    }
+
+
+    static getInstance():TagParser {
+        if (sInstance === null) {
+            sInstance = new TagParser()
+        }
+
+        return sInstance;
+    }
+
+    path(path:string) {
+        return this.in(
+            textDecoder.decode(Deno.readFileSync(path)))
     }
 
     in(fileContent:string) {

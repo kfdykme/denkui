@@ -13,16 +13,19 @@
 import logger from './log/console.ts'
 import {FileLoader} from './core/FileLoader.ts'
 import {AppLoader} from './core/AppLoader.ts'
+import LifeCycleController from './core/LifeCycleController.ts'
+ 
 let count = 0
 let pageStack:any[] = []
 let pageMap = {};
 let app : AppLoader;
 
+
+
 /**
  * replace
  * @param obj 
  */
-
 const replace = async (obj:any) => {
     logger.info('ROUTER.replace',obj, ++count)
     
@@ -34,7 +37,7 @@ const replace = async (obj:any) => {
     let appPage = module.default 
 
     pageStack.pop()
-    addPageIntoStakc(appPage)
+    addPageIntoStack(appPage)
     // pageStack.forEach((i:any) => {
     //     logger.info(i)
     // })
@@ -42,13 +45,21 @@ const replace = async (obj:any) => {
     return appPage
 }
 
-const addPageIntoStakc = (page:any) => {
+const attach = async (page:any) => {
+    return await  LifeCycleController.getInstance()
+    .attachView(page)
+}
+
+const addPageIntoStack = async (page:any) => {
     pageStack.push(page)
-    page.onInit()
     app.currentPage = {
         ...page,
     ...page.protected}
     app.currentPage.$app = app.app
+    
+    await attach(page)
+
+    page.onInit()
 }
 
 const push = async (obj:any) => {
@@ -62,8 +73,9 @@ const push = async (obj:any) => {
     
     logger.info('ROUTER push import', p)
     let appPage = module.default 
-
-    addPageIntoStakc(appPage)
+    appPage._view = result.view 
+    await addPageIntoStack(appPage)
+    
     pageStack.forEach((i:any) => {
         logger.info(i)
     })

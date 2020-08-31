@@ -14,8 +14,10 @@ export default class ManifestLoader {
     get():any {
         let decoder = new TextDecoder('utf-8')
         let path = this.rootPath + MANIFEST_FILE_NAME
+        logger.info('ManifestLoader get ', path)
         try {
             let json = decoder.decode(Deno.readFileSync(path))
+            logger.info("ManifestLoader manifest",json)
             return JSON.parse(json)
 
         } catch(e) {

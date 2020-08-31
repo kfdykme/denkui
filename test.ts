@@ -12,27 +12,7 @@ import {AppLoader} from './src/core/AppLoader.ts'
 let appLoader = new AppLoader();
 
 appLoader.load('app.ux')
-
-import { WebSocket, WebSocketServer } from "https://deno.land/x/websocket@v0.0.3/mod.ts";
-
-const wss = new WebSocketServer(8080);
-
-wss.on("connection", function (ws: WebSocket) {
-    ws.on("message", function (message: string) {
-        console.log('Current Page:', appLoader.currentPage)
-        console.info('message', message)
-        let vars = message.split(';')
-        let method = vars.shift() 
-        method = method ? method : ''
-        vars.forEach((item:string) => {
-            let [name, value] = item.split('=')
-            appLoader.currentPage[name] = value
-        })
-        console.info('method', method)
-        appLoader.currentPage[method]() 
-    });
-  });
-
+ 
 
 // 只要保证引入的内容没有问题,是完全可以import一个js/ts的
 // let module = await import(path)
