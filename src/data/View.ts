@@ -16,7 +16,7 @@ export class View {
     }
 
     toString() {
-        return JSON.stringify(this, null, 2)
+        return JSON.stringify(this)
     }
 
     /**

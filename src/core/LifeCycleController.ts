@@ -43,7 +43,10 @@ export default class LifeCycleController {
 
     onAttach() {
         console.info("LifeCycleController onAttach.");
-        this.ipc?.send('DENO_IS_OK')
+        this.ipc?.send(JSON.stringify({
+            method: 'UPDATE_STATE',
+            data: 'DENO_IS_OK'
+        }))
 
         let appLoader = new AppLoader();
 
@@ -56,7 +59,10 @@ export default class LifeCycleController {
             this.attachViewCallback =  () => {
                 reslove()
             }
-            this.ipc?.send(appPage?._view)
+            this.ipc?.send(JSON.stringify({
+                method:'RENDER_VIEW',
+                data:appPage?._view
+            }))
     
         })
 
