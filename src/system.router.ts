@@ -12,6 +12,7 @@
 
 import logger from './log/console.ts'
 import {FileLoader} from './core/FileLoader.ts'
+import {UxLoader} from './core/loader/UxLoader.ts'
 import {AppLoader} from './core/AppLoader.ts'
 import LifeCycleController from './core/LifeCycleController.ts'
  
@@ -19,7 +20,7 @@ let count = 0
 let pageStack:any[] = []
 let pageMap = {};
 let app : AppLoader;
-
+let uxLoader = new UxLoader();
 
 
 /**
@@ -28,14 +29,8 @@ let app : AppLoader;
  */
 const replace = async (obj:any) => {
     logger.info('ROUTER.replace',obj, ++count)
-    
-    let result = FileLoader.getInstance().loadRoute(obj.uri)
-    let p = '../' + result.path
-    let module = await import(p)
-    
-    logger.info('ROUTER replace import', p)
-    let appPage = module.default 
-
+        
+    let appPage = await uxLoader.load(obj.uri, app)
     pageStack.pop()
     addPageIntoStack(appPage)
     // pageStack.forEach((i:any) => {
@@ -52,28 +47,19 @@ const attach = async (page:any) => {
 
 const addPageIntoStack = async (page:any) => {
     pageStack.push(page)
-    app.currentPage = {
-        ...page,
-    ...page.protected}
-    app.currentPage.$app = app.app
-    
-    await attach(page)
 
-    page.onInit()
+  
+    app.currentPage = page
+    console.info("SYSTEM.ROUTER addPageIntoStack :", app.currentPage)
+    // await attach(page)
+
+    app.currentPage.onInit()
 }
 
 const push = async (obj:any) => {
-    logger.info("ROUTER push",obj)
-    let uri = obj.uri 
+    logger.info("ROUTER push",obj) 
+    let appPage = await uxLoader.load(obj.uri, app)
 
-    let result = FileLoader.getInstance().loadRoute(uri)
-    
-    let p = '../' + result.path
-    let module = await import(p)
-    
-    logger.info('ROUTER push import', p)
-    let appPage = module.default 
-    appPage._view = result.view 
     await addPageIntoStack(appPage)
     
     pageStack.forEach((i:any) => {

@@ -31,6 +31,7 @@ let getJson =  (o:any):any => {
         content = docoder.decode(Deno.readFileSync(STORAGE_PATH));
     } catch(e) {
         logger.info('STORAGE set', 'new sotrage init')
+        
     }
     
     let json = JSON.parse(content)
@@ -41,7 +42,11 @@ let get = (o:any) => {
     let key:string = o.key 
     let json = getJson(o)
     return new Promise((reslove, rejcet) => {
-        reslove(json)
+        let res = {
+            data:json[key]
+        }
+        logger.info("SYSTEM.STORAGE get ", o, " result is :", res)
+        reslove(res)
     })
 }
 
