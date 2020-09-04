@@ -12,6 +12,11 @@ declare interface Application {
 
 export class DataBinder {
 
+
+    setCallbacks:Function[] = []
+
+    getCallbacks:Function[] = []
+
     constructor(){
 
     }
@@ -19,28 +24,58 @@ export class DataBinder {
     static getInstance() {
         if (sInstance == null) {
             sInstance = new DataBinder()
+            sInstance.addSetCallback((key:string,value:string) => {
+                console.info("DataBinder bind data SET :", key, "->",value)
+            })
+            sInstance.addGetCallback((key:string,value:string) => {
+                console.info("DataBinder bind data GET :", key, "->", value)    
+            })
         }
         return sInstance
+    }
+    
+
+    addCallback(key:string, callback:Function):DataBinder {
+        if (key === 'set') {
+            return this.addSetCallback(callback)
+        } else if (key === 'get') {
+            return this.addGetCallback(callback)
+        }
+        return this
+    }
+
+    addSetCallback(callback:Function):DataBinder {
+        this.setCallbacks.push(callback)
+        return this
+    }
+
+    addGetCallback(callback:Function):DataBinder {
+        this.getCallbacks.push(callback)
+        return this
     }
 
     bind(page:UxData, app:Application) {
         //bind data 
+        let dataBinder = this
         for (let x in page.protected) {
         console.info("DataBinder bind data ", x)
         Object.defineProperty(page, x, {
             set: function(value) {
                 page.protected[x] = value
-                console.info("DataBinder bind data SET :", x, "->",value)
+                
+                //callback 
+                dataBinder.setCallbacks.forEach((f:Function) => f(x,value))
             },
             get: function() {
-                console.info("DataBinder bind data GET :", x, "->", page.protected[x])
-                return page.protected[x]
+                let value = page.protected[x]
+                dataBinder.getCallbacks.forEach((f:Function) => f(x, value))
+                return value
             }
         })
         }
-        // for (let x in page.protected) {
-        //     page[x]
-        // }
+        for (let x in page.protected) {
+            (page as any)[x]
+        }
         Object.defineProperty(page, '$app', {
             set: function (value) {
                 console.info("Can't change $app")

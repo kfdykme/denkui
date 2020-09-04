@@ -1,5 +1,5 @@
 import {FileLoader} from '../FileLoader.ts'
-import {DataBinder} from '../loader/DataBinder.ts'
+import {DataBinder} from '../binder/DataBinder.ts'
 import logger from '../../log/console.ts'
 
 export class UxLoader {

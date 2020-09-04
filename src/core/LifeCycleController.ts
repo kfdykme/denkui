@@ -1,6 +1,6 @@
 import IpcController from '../ipc/IpcController.ts';
 import {AppLoader} from '../core/AppLoader.ts';
-
+import {DataBinder} from '../core/binder/DataBinder.ts'
 
 let sInstance:LifeCycleController|null = null
 
@@ -19,6 +19,18 @@ export default class LifeCycleController {
 
     constructor () {
         this.ipc = null
+        let updateView = (key :string,value: string) => {
+            this.ipc?.send(JSON.stringify({
+                method: "UPDATE_VIEW",
+                data: {
+                    key: key,
+                    value: value
+                }
+            }))
+        }
+        DataBinder.getInstance()
+            .addSetCallback(updateView)
+            .addGetCallback(updateView)
     }
 
     start() {
