@@ -34,8 +34,8 @@ export default class LifeCycleController {
     }
 
     start() {
-        this.ipc = new IpcController(8082)
         console.info("LifeCyclerController start.")
+        this.ipc = new IpcController(8082)
         console.info("LifeCyclerController waiting flutter response.")
         
         this.ipc.addCallback((message:string) => {

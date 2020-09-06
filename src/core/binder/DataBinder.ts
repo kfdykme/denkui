@@ -17,6 +17,8 @@ export class DataBinder {
 
     getCallbacks:Function[] = []
 
+    map:Map<String,boolean> = new Map()
+
     constructor(){
 
     }
@@ -53,37 +55,47 @@ export class DataBinder {
         this.getCallbacks.push(callback)
         return this
     }
+    
 
     bind(page:UxData, app:Application) {
         //bind data 
         let dataBinder = this
         for (let x in page.protected) {
-        console.info("DataBinder bind data ", x)
-        Object.defineProperty(page, x, {
-            set: function(value) {
-                page.protected[x] = value
-                
-                //callback 
-                dataBinder.setCallbacks.forEach((f:Function) => f(x,value))
-            },
-            get: function() {
-                let value = page.protected[x]
-                dataBinder.getCallbacks.forEach((f:Function) => f(x, value))
-                return value
-            }
-        })
+            console.info("DataBinder bind data ", x, 'has defined: ', this.map.get(x))
+            if (this.map.get(x) === undefined || 
+                this.map.get(x) === false)
+
+                Object.defineProperty(page, x, {
+                    set: function(value) {
+                        page.protected[x] = value
+                        
+                        //callback 
+                        dataBinder.setCallbacks.forEach((f:Function) => f(x,value))
+                    },
+                    get: function() {
+                        let value = page.protected[x]
+                        dataBinder.getCallbacks.forEach((f:Function) => f(x, value))
+                        return value
+                    }
+                })
+                this.map.set(x, true)
         }
         for (let x in page.protected) {
             (page as any)[x]
         }
-        Object.defineProperty(page, '$app', {
-            set: function (value) {
-                console.info("Can't change $app")
-            },
-            get: function () {
-                return app.app
-            }
-        })
+
+        if (this.map.get('$app') === undefined || 
+        this.map.get('$app') === false) {
+            Object.defineProperty(page, '$app', {
+                set: function (value) {
+                    console.info("Can't change $app")
+                },
+                get: function () {
+                    return app.app
+                }
+            })
+        }
+        this.map.set('$app', true)
     }
 }
  
