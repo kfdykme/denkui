@@ -51,9 +51,11 @@ const addPageIntoStack = async (page:any) => {
   
     app.currentPage = page
     console.info("SYSTEM.ROUTER addPageIntoStack :", app.currentPage)
+ 
     await attach(page)
 
     app.currentPage.onInit()
+
 }
 
 const push = async (obj:any) => {

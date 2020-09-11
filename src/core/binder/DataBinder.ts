@@ -1,8 +1,12 @@
+import { View } from "../../data/View.ts"
 
 let sInstance:DataBinder|null = null
 
-declare interface UxData {
+export declare interface UxData {
     protected: any
+    _view:View
+    replace:Function
+    renderView:Function
 }
 
 declare interface Application {
@@ -79,9 +83,10 @@ export class DataBinder {
                     }
                 })
                 this.map.set(x, true)
-        }
+        } 
         for (let x in page.protected) {
-            (page as any)[x]
+            // bind data to view 
+            page._view.replace(x, (page as any)[x])
         }
 
         if (this.map.get('$app') === undefined || 

@@ -31,12 +31,12 @@ export default class TagParser {
         return sInstance;
     }
 
-    path(path:string) {
+    path(path:string):View {
         return this.in(
             textDecoder.decode(Deno.readFileSync(path)))
     }
 
-    in(fileContent:string) {
+    in(fileContent:string):View {
         let templateReg = /\<template\>(.|\r|\n|\r\n)*?\<\/template>/
 
         let result 
@@ -45,7 +45,7 @@ export default class TagParser {
             let templateContent = result[0]
             return this.readTag(templateContent)
         }
-        return 'no template element'
+        return new View("no template element")
     }
 
     createNode(name:string):View {
@@ -69,9 +69,9 @@ export default class TagParser {
         this.cur.addContent(s)
     }
 
-    readTag(content:string):any {  
-
-        this.stack.push(this.cur)
+    readTag(content:string):View {  
+        this.cur = this.createNode('<view>')
+        this.stack = [this.cur]
 
  
         content.split(/(\r|\n|\r\n)/g).map(i => { 
@@ -100,8 +100,6 @@ export default class TagParser {
         })
         
         this.cur.build()
-
-        // return ''
-        return this.cur.toString()
+        return this.cur
     }
 }

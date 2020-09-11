@@ -1,12 +1,14 @@
 import {FileLoader} from '../FileLoader.ts'
-import {DataBinder} from '../binder/DataBinder.ts'
+import {DataBinder, UxData} from '../binder/DataBinder.ts'
 import logger from '../../log/console.ts'
-
+import { View } from '../../data/View.ts'
+ 
 export class UxLoader {
 
     constructor() {
 
     }
+
 
     async load(uri:string, app:any) {
         let result =  FileLoader.getInstance().loadRoute(uri)        
@@ -15,8 +17,16 @@ export class UxLoader {
         let module = await import(p)
         
         let page = module.default 
-        page._view = result.view 
-   
+        page._view = result.view         
+        page.replace = function (key:string, value:any) {
+            this._view.replace(key, value)
+        }
+
+        console.info("TYPEOF ${typeof page._view}",typeof page._view)
+        page.renderView = function() { 
+            return this._view.toString();
+        }
+
         DataBinder.getInstance().bind(page, app)
 
         return page

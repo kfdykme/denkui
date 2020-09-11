@@ -47,7 +47,14 @@ export class View {
         this.childs.forEach((child:View) => {
             child.build()
         })
+    }
 
+    replace(key:string, value:any) {
+        this.content = this.content.replace(`{{${key}}}`, value)
+        
+        this.childs.forEach((child:View) => {
+            child.replace(key, value)
+        })
     }
 }
 

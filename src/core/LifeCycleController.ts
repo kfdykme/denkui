@@ -1,6 +1,7 @@
 import IpcController from '../ipc/IpcController.ts';
 import {AppLoader} from '../core/AppLoader.ts';
-import {DataBinder} from '../core/binder/DataBinder.ts'
+import {DataBinder,UxData} from '../core/binder/DataBinder.ts'
+
 
 let sInstance:LifeCycleController|null = null
 
@@ -8,6 +9,7 @@ export default class LifeCycleController {
 
     ipc:IpcController|null 
     attachViewCallback:Function|null = null
+    currentPage:UxData|null = null
 
     static getInstance ():LifeCycleController {
         if (sInstance === null) {
@@ -19,14 +21,20 @@ export default class LifeCycleController {
 
     constructor () {
         this.ipc = null
-        let updateView = (key :string,value: string) => {
+        let updateView = (key :string,value: any) => {
+            this.currentPage?.replace(key, value)
+            console.info("UPDATE_VIEW_RENDER_VIEW ->", this.currentPage)
             this.ipc?.send(JSON.stringify({
-                method: "UPDATE_VIEW",
-                data: {
-                    key: key,
-                    value: value
-                }
+                method:'RENDER_VIEW',
+                data: this.currentPage?.renderView()
             }))
+            // this.ipc?.send(JSON.stringify({
+            //     method: "UPDATE_VIEW",
+            //     data: {
+            //         key: key,
+            //         value: value
+            //     }
+            // }))
         }
         DataBinder.getInstance()
             .addSetCallback(updateView)
@@ -66,14 +74,14 @@ export default class LifeCycleController {
     }
 
     async attachView(appPage:any) {
-        
+        this.currentPage = appPage
         return new Promise((reslove, rejcet) => {
             this.attachViewCallback =  () => {
                 reslove()
             }
             this.ipc?.send(JSON.stringify({
                 method:'RENDER_VIEW',
-                data:appPage?._view
+                data:appPage?.renderView()
             }))
     
         })
