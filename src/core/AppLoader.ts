@@ -34,6 +34,11 @@ export class AppLoader{
                 uri: entry
             })
         }
+        this.app['$def'] = {
+            cache: {
+                
+            }
+        }
         logger.info(this.app)
         this.app.hookCreate()
     }

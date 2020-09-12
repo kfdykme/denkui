@@ -1,11 +1,12 @@
 
 const filters:string[] = [
-    'FileLoader', 
+    // 'FileLoader', 
     'TAGREADER',
     "TagParser",
     "ManifestLoader",
     "TagData",
     "IpcController",
+    "FETCH",
     "LifeCycleController"
 ]
 

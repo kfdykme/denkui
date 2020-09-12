@@ -57,13 +57,19 @@ export default class LifeCycleController {
         return this.emptyFunction
     }
 
-    invoke(method: String) {
+    invoke(method: String, event:any) {
         logger.info("LifeCycleController try invoke: ", method)
         let methodFunc:Function = this.getCurrentPageMethod(method)
         logger.info(methodFunc)
-        methodFunc.call(this.currentPage)
+        methodFunc.call(this.currentPage, event) 
+        logger.info("LifeCycleController try invoke end: ", method) 
+    }
 
-        logger.info("LifeCycleController try invoke fail: ", method) 
+    handleEvent(event: any) {
+        console.info("HANDLE ", event)
+        if (event['mod'] == 'invoke') {
+            this.invoke(event['function'], JSON.parse(event['param']))
+        }
     }
 
     start() {
@@ -71,18 +77,26 @@ export default class LifeCycleController {
         this.ipc = new IpcController(8082)
         logger.info("LifeCycleController waiting flutter response.")
         
-        this.ipc.addCallback((message:string) => {
+        this.ipc.addCallback((message:string) => { 
             if (message === 'DENKUI_START') {
                 this.onAttach()
+                return
             }
 
             if (message === 'DENKUI_ON_ATTACH_VIEW_END') {
                 this.attachViewCallback && this.attachViewCallback()
+                return 
             }
-            
-            if (message.startsWith('invoke')) {
-                this.invoke(message.split(':')[1]);
-            }
+            let jsonMessage:any|null = null
+           try {
+               jsonMessage = JSON.parse(message)
+            } catch(error) {
+              logger.error(error, message)
+             }
+
+           if (jsonMessage != null) {
+               this.handleEvent(jsonMessage)
+           } 
         })
         // this.ipc.addCallback((msg:string) => {
         //     logger.info(msg)

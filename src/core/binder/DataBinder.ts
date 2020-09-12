@@ -89,18 +89,22 @@ export class DataBinder {
             page._view.replace(x, (page as any)[x])
         }
 
-        if (this.map.get('$app') === undefined || 
-        this.map.get('$app') === false) {
+        // if (this.map.get('$app') === undefined || 
+        // this.map.get('$app') === false) 
+        {
             Object.defineProperty(page, '$app', {
                 set: function (value) {
+                    dataBinder.getCallbacks.forEach((f:Function) => f('$app', value))
                     console.info("Can't change $app")
                 },
                 get: function () {
+                    dataBinder.setCallbacks.forEach((f:Function) => f('$app',app.app))
                     return app.app
                 }
             })
+ 
         }
-        this.map.set('$app', true)
+        // this.map.set('$app', true)
     }
 }
  
