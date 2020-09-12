@@ -4,7 +4,9 @@ const filters:string[] = [
     'TAGREADER',
     "TagParser",
     "ManifestLoader",
-    "TagData"
+    "TagData",
+    "IpcController",
+    "LifeCycleController"
 ]
 
 const isFilted = (...vars:any[]) => {
@@ -21,14 +23,14 @@ const isFilted = (...vars:any[]) => {
 export default  {
     info: (...vars: any[]) => {
         if(isFilted(vars)) return 
-        console.info(...vars)
+        console.info(new Date(), ...vars)
     },
     error:(...vars: any[]) => {
         if(isFilted(vars)) return
-        console.error(...vars)
+        console.error(new Date(), ...vars)
     },
     log:(...vars: any[]) => {
         if(isFilted(vars)) return
-        console.log(...vars)
+        console.log(new Date(), ...vars)
     }
 }

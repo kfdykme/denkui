@@ -1,7 +1,7 @@
 import IpcController from '../ipc/IpcController.ts';
 import {AppLoader} from '../core/AppLoader.ts';
 import {DataBinder,UxData} from '../core/binder/DataBinder.ts'
-
+import logger from '../log/console.ts'
 
 let sInstance:LifeCycleController|null = null
 
@@ -23,7 +23,7 @@ export default class LifeCycleController {
         this.ipc = null
         let updateView = (key :string,value: any) => {
             this.currentPage?.replace(key, value)
-            console.info("UPDATE_VIEW_RENDER_VIEW ->", this.currentPage)
+            logger.info("LifeCycleController UPDATE_VIEW_RENDER_VIEW ->", this.currentPage)
             this.ipc?.send(JSON.stringify({
                 method:'RENDER_VIEW',
                 data: this.currentPage?.renderView()
@@ -42,7 +42,7 @@ export default class LifeCycleController {
     }
 
     emptyFunction() {
-        console.info("LifeCycleController emptyFunction()")
+        logger.info("LifeCycleController emptyFunction()")
     }
 
     getCurrentPageMethod(method:any) {
@@ -58,18 +58,18 @@ export default class LifeCycleController {
     }
 
     invoke(method: String) {
-        console.info("LifeCycleController try invoke: ", method)
+        logger.info("LifeCycleController try invoke: ", method)
         let methodFunc:Function = this.getCurrentPageMethod(method)
-        console.info(methodFunc)
+        logger.info(methodFunc)
         methodFunc.call(this.currentPage)
 
-        console.info("LifeCycleController try invoke fail: ", method) 
+        logger.info("LifeCycleController try invoke fail: ", method) 
     }
 
     start() {
-        console.info("LifeCyclerController start.")
+        logger.info("LifeCycleController start.")
         this.ipc = new IpcController(8082)
-        console.info("LifeCyclerController waiting flutter response.")
+        logger.info("LifeCycleController waiting flutter response.")
         
         this.ipc.addCallback((message:string) => {
             if (message === 'DENKUI_START') {
@@ -85,13 +85,13 @@ export default class LifeCycleController {
             }
         })
         // this.ipc.addCallback((msg:string) => {
-        //     console.info(msg)
+        //     logger.info(msg)
         // })
     }
 
 
     onAttach() {
-        console.info("LifeCycleController onAttach.");
+        logger.info("LifeCycleController onAttach.");
         this.ipc?.send(JSON.stringify({
             method: 'UPDATE_STATE',
             data: 'DENO_IS_OK'

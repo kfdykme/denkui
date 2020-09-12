@@ -1,4 +1,5 @@
 import { WebSocket, WebSocketServer } from "https://deno.land/x/websocket@v0.0.3/mod.ts";
+import logger from '../log/console.ts'
 
 export default class IpcController {
     
@@ -9,13 +10,13 @@ export default class IpcController {
 
     constructor(port:number) {
         this.wss = new WebSocketServer(port)
-        console.info("IpcController init at port ", port)
+        logger.info("IpcController init at port ", port)
         this.wss.on("connection", (ws: WebSocket) => {
             this.ws = ws
-            console.info('IpcController ws connection success at', new Date())
+            logger.info('IpcController ws connection success at', new Date())
             this.ws.on("message", (message:any) => { 
-                console.info('IpcController on message', message)
-                console.info('IpcController callbacks:', this.callbacks)
+                logger.info('IpcController on message', message)
+                logger.info('IpcController callbacks:', this.callbacks)
                 // Array.from(this.callbacks.values()).forEach((i:Function) => { 
                 //     i(message)
                 // })
@@ -28,7 +29,7 @@ export default class IpcController {
  
 
     send(data:any) {
-        console.info("IpcController send type:", typeof data,'data', data)
+        logger.info("IpcController send type:", typeof data,'data', data)
         data && this.ws?.send(data)
     }
  
