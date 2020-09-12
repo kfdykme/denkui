@@ -41,6 +41,31 @@ export default class LifeCycleController {
             .addGetCallback(updateView)
     }
 
+    emptyFunction() {
+        console.info("LifeCycleController emptyFunction()")
+    }
+
+    getCurrentPageMethod(method:any) {
+        if (this.currentPage == null) {
+            return this.emptyFunction
+        }
+
+        if (typeof (this.currentPage as any)[method] == 'function') {
+            return (this.currentPage as any)[method]
+        }
+
+        return this.emptyFunction
+    }
+
+    invoke(method: String) {
+        console.info("LifeCycleController try invoke: ", method)
+        let methodFunc:Function = this.getCurrentPageMethod(method)
+        console.info(methodFunc)
+        methodFunc.call(this.currentPage)
+
+        console.info("LifeCycleController try invoke fail: ", method) 
+    }
+
     start() {
         console.info("LifeCyclerController start.")
         this.ipc = new IpcController(8082)
@@ -53,6 +78,10 @@ export default class LifeCycleController {
 
             if (message === 'DENKUI_ON_ATTACH_VIEW_END') {
                 this.attachViewCallback && this.attachViewCallback()
+            }
+            
+            if (message.startsWith('invoke')) {
+                this.invoke(message.split(':')[1]);
             }
         })
         // this.ipc.addCallback((msg:string) => {
