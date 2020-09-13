@@ -50,8 +50,12 @@ export class View {
     }
 
     replace(key:string, value:any) {
-        this.content = this.content.replace(`{{${key}}}`, value)
-        this.jsonParams = JSON.parse(JSON.stringify(this.jsonParams).replace(`{{${key}}}`, value))
+        if (this.content) {
+            this.content = this.content.replace(`{{${key}}}`, value)
+        }
+        if (this.jsonParams) {
+            this.jsonParams = JSON.parse(JSON.stringify(this.jsonParams).replace(`{{${key}}}`, value))
+        }
         this.childs.forEach((child:View) => {
             child.replace(key, value)
         })

@@ -1,10 +1,10 @@
 
 const filters:string[] = [
-    // 'FileLoader', 
-    'FileLoader load loadSystem',
-    'FileLoader load mport:',
-    'FileLoader tag',
-    'AppLoader',
+    'FileLoader', 
+    // 'FileLoader load loadSystem',
+    // 'FileLoader load mport:',
+    // 'FileLoader tag',
+    // 'AppLoader',
     'makeSureDir',
     'TAGREADER',
     "TagParser",
@@ -12,6 +12,7 @@ const filters:string[] = [
     "TagData",
     "IpcController",
     "FETCH",
+    'HANDLE',
     "LifeCycleController"
 ]
 

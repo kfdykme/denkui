@@ -94,11 +94,11 @@ export class DataBinder {
         {
             Object.defineProperty(page, '$app', {
                 set: function (value) {
-                    dataBinder.getCallbacks.forEach((f:Function) => f('$app', value))
+                    // dataBinder.getCallbacks.forEach((f:Function) => f('$app', value))
                     console.info("Can't change $app")
                 },
                 get: function () {
-                    dataBinder.setCallbacks.forEach((f:Function) => f('$app',app.app))
+                    // dataBinder.setCallbacks.forEach((f:Function) => f('$app',app.app))
                     return app.app
                 }
             })

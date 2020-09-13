@@ -22,7 +22,6 @@ export class UxLoader {
             this._view.replace(key, value)
         }
 
-        console.info("TYPEOF ${typeof page._view}",typeof page._view)
         page.renderView = function() { 
             return this._view.toString();
         }
