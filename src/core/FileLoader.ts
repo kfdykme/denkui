@@ -49,13 +49,13 @@ export class FileLoader {
         //1 get script content or src attr 
         let realPath = SOURCE_ROOT_PATH + path
         let tag = readTag('script', realPath)
-        logger.info(tag,realPath)
+        logger.info('FileLoader tag', tag,realPath)
         let content = ''
         let targetJsFilePath = ''
         if (tag.content !== '') {
             content = tag.content
             targetJsFilePath = this.getDirPathFromFilePath(path) + 'index.js' 
-        } else if (tag.params.src) {
+        } else if (tag.params.src) { 
             let dirPath = this.getDirPathFromFilePath(realPath)
             content = this.decoder.decode(Deno.readFileSync(
                 dirPath + tag.params.src
@@ -126,7 +126,8 @@ export class FileLoader {
         }
     }
 
-    loadContent(content: string, path:string) {
+    loadContent(content: string, path:string, level:number = 0) {
+        level++
         logger.info('FileLoader loadContent', path)
         // 0 remove moduls can't run in deno
         const regDenoFilter = /\/\/startDeno((\r|\n|\r\n)(.*))*?\/\/endDeno/
@@ -157,11 +158,15 @@ export class FileLoader {
                 } else if (regTarget.includes("https")) {
                     // do nothing
                 } else if (regTarget.includes('/')){
-                   content = this.loadOtherModule(imp, regTarget, path,content)
+                    if (level > 1) {
+                        content = this.loadOtherModule(imp, regTarget, path.replace(SOURCE_ROOT_PATH,''),content, level)
+                    } else {
+                        content = this.loadOtherModule(imp, regTarget, path,content, level)
+                    }
                 }
             } else {
                 
-             logger.info(res, res?.length)
+             logger.info('res < 1' ,res, res?.length)
             }
         })
 
@@ -176,7 +181,7 @@ export class FileLoader {
             let res = regItem2.exec(imp)
             if (res && res.length > 3) {
                 let regTarget = res[2]
-                content = this.loadOtherModule(imp, regTarget, path, content)
+                content = this.loadOtherModule(imp, regTarget, path, content, level)
             }
         })
 
@@ -196,12 +201,12 @@ export class FileLoader {
        return content.replace(importStatement,importStatement.replace(target,target.replace('@system','file:///' +Deno.cwd().replace(/\\/g,'/') +'/src/system') + '.ts'))
     }
 
-    loadOtherModule(importStatement:string, target:string,currentFilePath:string, content:string) {
-        logger.info('FileLoader loadOtherModule')
+    loadOtherModule(importStatement:string, target:string,currentFilePath:string, content:string, level:number = 0) {
+        logger.info('FileLoader loadOtherModule level:', level)
         logger.info('FileLoader',importStatement, target )
         logger.info('FileLoader currentFilePath', currentFilePath)
         // 去除前后符号
-        target = target.replace(/\'/g, '').replace(/\"/g,'')
+        target = target.replace(/\'/g, '').replace(/\"/g,'').trim()
         //TODO 这样写不太好 逻辑不是很顺
         content = content.replace(target, target + '.js')
         let info:any = {
@@ -229,7 +234,7 @@ export class FileLoader {
         logger.info('FileLoader loadOtherModule try to read targetFileRealPath: ', targetFileRealPath)
         let targetFileContent = this.decoder.decode(Deno.readFileSync(targetFileRealPath))
         // logger.info("FileLoader loadOtherModule content:\n\n" + targetFileContent,'\n\n')
-        let res = this.loadContent(targetFileContent, targetFileRealPath)
+        let res = this.loadContent(targetFileContent, targetFileRealPath, level)
         targetFileContent = res.content + ""
         // 1.2 load and write target file to out dir
         Deno.writeFileSync(MIDDLE_JS_OUTPUT_PATH + info.currentFileDirPath +  info.targetFilePath + '.js',
