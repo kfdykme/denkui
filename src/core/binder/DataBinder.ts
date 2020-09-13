@@ -4,6 +4,7 @@ let sInstance:DataBinder|null = null
 
 export declare interface UxData {
     protected: any
+    _route:string
     _view:View
     replace:Function
     renderView:Function
@@ -89,8 +90,8 @@ export class DataBinder {
             page._view.replace(x, (page as any)[x])
         }
 
-        // if (this.map.get('$app') === undefined || 
-        // this.map.get('$app') === false) 
+        if (this.map.get('$app' + page._route) === undefined || 
+        this.map.get('$app' + page._route) === false) 
         {
             Object.defineProperty(page, '$app', {
                 set: function (value) {
@@ -104,7 +105,7 @@ export class DataBinder {
             })
  
         }
-        // this.map.set('$app', true)
+        this.map.set('$app' + page._route, true)
     }
 }
  

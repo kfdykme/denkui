@@ -36,7 +36,10 @@ export class FileLoader {
         // 2 load ux 
         let realPagePath = route + '/' + routerPage + '.ux'
         logger.info('FileLoader result', route + '/' + routerPage)
-        return this.load(realPagePath)
+        return {
+            route: route,
+            ...this.load(realPagePath)
+        }
     }
 
     /**
@@ -119,6 +122,7 @@ export class FileLoader {
             Deno.writeFileSync(MIDDLE_JS_OUTPUT_PATH + path ,
                 this.encoder.encode(res.content))
             return {
+
                 view:view,
                 content: res.content,
                 path:MIDDLE_JS_OUTPUT_PATH + path

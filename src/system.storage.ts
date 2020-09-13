@@ -16,11 +16,9 @@ const encoder = new TextEncoder()
     let value:string = o.value
     Deno.mkdirSync('~/.denkui/', { recursive: true})
 
-    let content = '{}'
-   
-    let json = JSON.parse(content)
+    let json = getJson(o)
     json[key] = value
-    content = JSON.stringify(json)
+    let content = JSON.stringify(json)
     Deno.writeFileSync(STORAGE_PATH, encoder.encode(content))
 }
 

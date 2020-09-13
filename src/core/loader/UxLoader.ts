@@ -17,6 +17,7 @@ export class UxLoader {
         let module = await import(p)
         
         let page = module.default 
+        page._route = result.route
         page._view = result.view         
         page.replace = function (key:string, value:any) {
             this._view.replace(key, value)
