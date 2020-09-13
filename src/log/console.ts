@@ -1,6 +1,11 @@
 
 const filters:string[] = [
     // 'FileLoader', 
+    'FileLoader load loadSystem',
+    'FileLoader load mport:',
+    'FileLoader tag',
+    'AppLoader',
+    'makeSureDir',
     'TAGREADER',
     "TagParser",
     "ManifestLoader",

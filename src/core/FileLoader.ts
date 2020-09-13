@@ -226,7 +226,7 @@ export class FileLoader {
         if (!targetFileRealPath.endsWith('.js') ) {
             targetFileRealPath += '.js'
         }
-
+        logger.info('FileLoader loadOtherModule try to read targetFileRealPath: ', targetFileRealPath)
         let targetFileContent = this.decoder.decode(Deno.readFileSync(targetFileRealPath))
         // logger.info("FileLoader loadOtherModule content:\n\n" + targetFileContent,'\n\n')
         let res = this.loadContent(targetFileContent, targetFileRealPath)

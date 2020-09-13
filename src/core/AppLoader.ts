@@ -39,7 +39,7 @@ export class AppLoader{
                 
             }
         }
-        logger.info(this.app)
+        logger.info('AppLoader', this.app)
         this.app.hookCreate()
     }
 }
