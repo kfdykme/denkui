@@ -19,6 +19,10 @@ export default class LifeCycleController {
         return sInstance;
     }
 
+    static currentPage():UxData|null {
+        return sInstance? sInstance.currentPage : null
+    }
+
     constructor () {
         this.ipc = null
         let updateView = (key :string,value: any) => {
@@ -26,7 +30,7 @@ export default class LifeCycleController {
             logger.info("LifeCycleController UPDATE_VIEW_RENDER_VIEW ->", this.currentPage)
             this.ipc?.send(JSON.stringify({
                 method:'RENDER_VIEW',
-                data: this.currentPage?.renderView()
+                data:LifeCycleController.currentPage()?.renderView()
             }))
             // this.ipc?.send(JSON.stringify({
             //     method: "UPDATE_VIEW",

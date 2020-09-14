@@ -32,7 +32,7 @@ const replace = async (obj:any) => {
         
     let appPage = await uxLoader.load(obj.uri, app)
     pageStack.pop()
-    addPageIntoStack(appPage)
+    await addPageIntoStack(appPage)
     // pageStack.forEach((i:any) => {
     //     logger.info(i)
     // })
@@ -47,7 +47,6 @@ const attach = async (page:any) => {
 
 const addPageIntoStack = async (page:any) => {
     pageStack.push(page)
-
   
     app.currentPage = page
     console.info("SYSTEM.ROUTER addPageIntoStack :", app.currentPage)
@@ -55,7 +54,6 @@ const addPageIntoStack = async (page:any) => {
     await attach(page)
 
     app.currentPage.onInit()
-
 }
 
 const push = async (obj:any) => {

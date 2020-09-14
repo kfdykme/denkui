@@ -73,12 +73,16 @@ export class DataBinder {
                 Object.defineProperty(page, x, {
                     set: function(value) {
                         page.protected[x] = value
-                        
+                        console.info(`DataBinder on set page._view == null:${page._view == null}:${x}->${value}`)
+                        page._view?.replace(x, value)
                         //callback 
                         dataBinder.setCallbacks.forEach((f:Function) => f(x,value))
                     },
                     get: function() {
                         let value = page.protected[x]
+                        
+                        console.info(`DataBinder on get page._view == null:${page._view == null}:${x}->${value}`)
+                        page._view?.replace(x, value)
                         dataBinder.getCallbacks.forEach((f:Function) => f(x, value))
                         return value
                     }
