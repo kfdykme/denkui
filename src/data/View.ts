@@ -28,13 +28,16 @@ export class View {
         let res:any = nameReg.exec(this.name)
         let template = this.name
         this.name = res ? res[1] : ''
-        this.content = template.substring(this.name.length) 
+        this.content = template.substring(this.name.length+1).trim()
 
         // 如果是单行的view
         let paramReg = /([a-z]|-|@|)+=\"(.| )*?\"/g
         let contentReg = /\>(.*)?\<\// 
+         
         this.content.match(paramReg)?.forEach((keyValue:string) => {
-            let [key, value] = keyValue.split('=') 
+            let spIndex:number = keyValue.indexOf('=')
+            let key = keyValue.substring(0, spIndex)
+            let value = keyValue.substring(spIndex+1) 
             this.params.set(key, value.replace(/\"/g,''))
         })
         
@@ -52,10 +55,10 @@ export class View {
 
     deleteNull() {
         if (this.content == "") delete(this.content)
-        if (this.params.values.length == 0) {
-            delete(this.params)
-            delete(this.jsonParams)
-        }
+        // if (this.jsonParams.values.length == 0) {
+        //     delete(this.params)
+        //     delete(this.jsonParams)
+        // }
         this.childs.forEach(child => {
             child.deleteNull()
         })
