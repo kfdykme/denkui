@@ -31,7 +31,7 @@ export class View {
         this.content = template.substring(this.name.length) 
 
         // 如果是单行的view
-        let paramReg = /([a-z]|-)+=\".*?\"/g
+        let paramReg = /([a-z]|-|@|)+=\"(.| )*?\"/g
         let contentReg = /\>(.*)?\<\// 
         this.content.match(paramReg)?.forEach((keyValue:string) => {
             let [key, value] = keyValue.split('=') 
@@ -73,7 +73,7 @@ export class View {
 
     replace(key:string, value:any) {
         if (this.content) {
-            console.info(`View replace {{${key}}} into ${value} at ${this.content.indexOf(key)}`)
+            console.info(`View replace {{${key}}} into ${value} at ${this.content.indexOf(key)} \n`)
             this.content = this.content.replace(`{{${key}}}`, value)
         }
         if (this.jsonParams) {
