@@ -26,6 +26,11 @@ export class FileLoader {
         return sInstance
     }
 
+    /**
+     * 以在Manifest.json中定义的route作为相对路径查找并加载对应位置的ux文件
+     * @param route 
+     * @return 返回 route 等信息
+     */
     loadRoute(route: string) {
         logger.info('FileLoader loadRoute', route)
         //1 到Manifest去找route的相关内容
@@ -77,6 +82,11 @@ export class FileLoader {
         }
     }
 
+    /**
+     * 1. 如果加载的是js文件, 加载该js文件,拷贝到输出目录,并返回处理过的结果和路径
+     * 2. 如果加载的不是js文件(暂时默认当做ux文件), 加载该js文件,拷贝script标签的内容到输出目录,并返回处理的结果和路径
+     * @param path 加载的文件的相对与SOURCE_ROOT_PATH的路径
+     */
     load(path:string) {
         logger.info('FileLoader load', path)
         //0 find target file from source dir
@@ -130,6 +140,15 @@ export class FileLoader {
         }
     }
 
+    /**
+     * 加载js文件的具体实现.
+     * 
+     * 处理js内容中的import, 实现迭代import
+     * 处理对system能力的import 
+     * @param content 
+     * @param path 
+     * @param level 根据level判断是第一次import还是import中的import 用于bugfix. 后续改进
+     */
     loadContent(content: string, path:string, level:number = 0) {
         level++
         logger.info('FileLoader loadContent', path)
@@ -198,6 +217,12 @@ export class FileLoader {
         }
     }
 
+    /**
+     * 加载system能力, 将对system能力的import指向实际的实现文件
+     * @param importStatement 
+     * @param target 
+     * @param content 
+     */
     loadSystemModule(importStatement:string, target:string,content:string) {
         // fetch.ts
         logger.info("FileLoader load loadSystemModule")
@@ -205,6 +230,14 @@ export class FileLoader {
        return content.replace(importStatement,importStatement.replace(target,target.replace('@system','file:///' +Deno.cwd().replace(/\\/g,'/') +'/src/system') + '.ts'))
     }
 
+    /**
+     * 加载非system能力的脚步文件 比较复杂
+     * @param importStatement 
+     * @param target 
+     * @param currentFilePath 
+     * @param content 
+     * @param level 
+     */
     loadOtherModule(importStatement:string, target:string,currentFilePath:string, content:string, level:number = 0) {
         logger.info('FileLoader loadOtherModule level:', level)
         logger.info('FileLoader',importStatement, target )
@@ -247,6 +280,10 @@ export class FileLoader {
         return content
     }
 
+    /**
+     * 从文件路径得到该文件的父文件夹路径
+     * @param filePath 
+     */
     getDirPathFromFilePath(filePath: string) {
         let tArr = filePath.split(/\/|(\\\\)/)
             .filter(i => i)         // 有可能包含undefined
@@ -255,12 +292,20 @@ export class FileLoader {
         return tArr.join('/')
     } 
 
+    /**
+     * 从文件夹路径得到文件名称
+     * @param filePath 
+     */
     getNameFromFilePath(filePath:string) {
         let tArr = filePath.split(/\/|(\\\\)/)
         .filter(i => i)         // 有可能包含undefined
         return tArr.pop();
     }
 
+    /**
+     * 确保目标路径的文件夹存在
+     * @param path 
+     */
     makeSureDir(path:string) {
         logger.info("FileLoader makeSureDir try ", path)
         Deno.mkdirSync(path, {recursive: true})
