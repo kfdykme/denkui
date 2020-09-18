@@ -64,6 +64,54 @@ export class View {
         })
     }
 
+    innerEval (str:string, context:any)  {
+        let targetStrReg = /\{\{.*?\}\}/g
+        let res:string[]|null = targetStrReg.exec(str) 
+        let tryEval = (str:string) => {
+            try {
+                str = str.replace('{{', '').replace('}}','')
+                const reg = /([a-z]|[A-Z])(([a-z]|[A-Z]|[0-9])*)/
+                str = "(function() {  return " + 
+                str.split(' ')
+                .filter((f:string) => {
+                    return f.trim() != ''
+                })
+                .map(i => {
+                    if (reg.test(i) && i.indexOf('\'') == -1) {
+                        i = 'this.' + i
+                    }
+                    return i
+                }).join(' ') + 
+                "})" 
+                
+                return eval(str).call(context)
+            } catch(err) {
+                console.error(err)
+                return str
+            }
+          
+        }
+        res?.forEach((i:string) => {
+            str = str.replace(i, tryEval(i))
+        })
+        
+        return str
+        
+    }
+
+    eval(context:any, showContext:Boolean = true) {
+        if (showContext)
+            console.info('View eval context:', context)
+        this.params.forEach((value, key) => {
+            value = this.innerEval(value, context)
+            this.jsonParams[key] = value
+            console.info("View eval ", key,value)
+        }) 
+        this.childs.forEach(child => {
+            child.eval(context, false)
+        })
+    }
+
     
     format(level:number = 0) {
         let arr = new Array(level).fill(' ')
@@ -76,7 +124,8 @@ export class View {
 
     replace(key:string, value:any) {
         if (this.content) {
-            console.info(`View replace {{${key}}} into ${value} at ${this.content.indexOf(key)} \n`)
+            if (this.content.indexOf(key) != -1)
+                console.info(`View replace {{${key}}} into ${value} at ${this.content.indexOf(key)} \n`)
             this.content = this.content.replace(`{{${key}}}`, value)
         }
         if (this.jsonParams) {

@@ -42,7 +42,7 @@ export default class LifeCycleController {
         }
         DataBinder.getInstance()
             .addSetCallback(updateView)
-            .addGetCallback(updateView)
+            // .addGetCallback(updateView)
     }
 
     emptyFunction() {

@@ -4,6 +4,7 @@ let sInstance:DataBinder|null = null
 
 export declare interface UxData {
     protected: any
+    public: any
     _route:string
     _view:View
     replace:Function
@@ -61,25 +62,23 @@ export class DataBinder {
         return this
     }
     
-
-    bind(page:UxData, app:Application) {
-        //bind data 
+    _innerBind(page:any, app:Application, type:string) {
         let dataBinder = this
-        for (let x in page.protected) {
+        for (let x in page[type]) {
             console.info("DataBinder bind data ", x, 'has defined: ', this.map.get(x))
             if (this.map.get(x) === undefined || 
                 this.map.get(x) === false)
 
                 Object.defineProperty(page, x, {
                     set: function(value) {
-                        page.protected[x] = value
+                        page[type][x] = value
                         console.info(`DataBinder on set page._view == null:${page._view == null}:${x}->${value}`)
                         page._view?.replace(x, value)
                         //callback 
                         dataBinder.setCallbacks.forEach((f:Function) => f(x,value))
                     },
                     get: function() {
-                        let value = page.protected[x]
+                        let value = page[type][x]
                         
                         console.info(`DataBinder on get page._view == null:${page._view == null}:${x}->${value}`)
                         page._view?.replace(x, value)
@@ -89,10 +88,16 @@ export class DataBinder {
                 })
                 this.map.set(x, true)
         } 
-        for (let x in page.protected) {
+        for (let x in page[type]) {
             // bind data to view 
             page._view.replace(x, (page as any)[x])
         }
+    }
+
+    bind(page:UxData, app:Application) {
+        //bind data 
+        this._innerBind(page, app, 'protected')
+        this._innerBind(page, app, 'public')
 
         if (this.map.get('$app' + page._route) === undefined || 
         this.map.get('$app' + page._route) === false) 

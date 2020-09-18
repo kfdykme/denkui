@@ -24,6 +24,7 @@ export class UxLoader {
         }
 
         page.renderView = function() { 
+            this._view.eval(this)
             return this._view.toString();
         }
 
