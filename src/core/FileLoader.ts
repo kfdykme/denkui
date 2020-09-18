@@ -62,18 +62,18 @@ export class FileLoader {
         let targetJsFilePath = ''
         if (tag.content !== '') {
             content = tag.content
-            targetJsFilePath = this.getDirPathFromFilePath(path) + 'index.js' 
+            targetJsFilePath = FileLoader.getDirPathFromFilePath(path) + 'index.js' 
         } else if (tag.params.src) { 
-            let dirPath = this.getDirPathFromFilePath(realPath)
+            let dirPath = FileLoader.getDirPathFromFilePath(realPath)
             content = this.decoder.decode(Deno.readFileSync(
                 dirPath + tag.params.src
             ))
-            targetJsFilePath = this.getDirPathFromFilePath(path) + tag.params.src 
+            targetJsFilePath = FileLoader.getDirPathFromFilePath(path) + tag.params.src 
         } else {
             logger.error("FileLoader loadUx", 'fail')
         }
 
-        Deno.mkdirSync(MIDDLE_JS_OUTPUT_PATH +  this.getDirPathFromFilePath(path), { recursive: true})
+        Deno.mkdirSync(MIDDLE_JS_OUTPUT_PATH +  FileLoader.getDirPathFromFilePath(path), { recursive: true})
         Deno.writeFileSync(MIDDLE_JS_OUTPUT_PATH + targetJsFilePath, this.encoder.encode(content))
 
         return {
@@ -102,7 +102,7 @@ export class FileLoader {
             if (path.includes('.js')) {
             res = this.loadContent(content, path)
             
-            Deno.mkdirSync(MIDDLE_JS_OUTPUT_PATH + this.getDirPathFromFilePath(path), { recursive: true})
+            Deno.mkdirSync(MIDDLE_JS_OUTPUT_PATH + FileLoader.getDirPathFromFilePath(path), { recursive: true})
             Deno.writeFileSync(MIDDLE_JS_OUTPUT_PATH + path ,
                 this.encoder.encode(res.content))
             return {
@@ -113,7 +113,7 @@ export class FileLoader {
         // else if is ux file 
             
         // 1 copy ux file to intermediate
-            Deno.mkdirSync(MIDDLE_JS_OUTPUT_PATH + this.getDirPathFromFilePath(path), { recursive: true})
+            Deno.mkdirSync(MIDDLE_JS_OUTPUT_PATH + FileLoader.getDirPathFromFilePath(path), { recursive: true})
             Deno.writeFileSync(MIDDLE_JS_OUTPUT_PATH + path ,
                 this.encoder.encode(content))
 
@@ -248,13 +248,13 @@ export class FileLoader {
         content = content.replace(target, target + '.js')
         let info:any = {
             currentFilePath,
-            currentFileDirPath: this.getDirPathFromFilePath(currentFilePath)
+            currentFileDirPath: FileLoader.getDirPathFromFilePath(currentFilePath)
         }
 
         info = {
             ...info,
             targetFilePath: target,
-            targetFileDirPath: MIDDLE_JS_OUTPUT_PATH + info.currentFileDirPath + this.getDirPathFromFilePath(target),
+            targetFileDirPath: MIDDLE_JS_OUTPUT_PATH + info.currentFileDirPath + FileLoader.getDirPathFromFilePath(target),
             name: this.getNameFromFilePath(currentFilePath)
         }
         logger.info('FileLoader loadOtherModule info', info)
@@ -284,7 +284,7 @@ export class FileLoader {
      * 从文件路径得到该文件的父文件夹路径
      * @param filePath 
      */
-    getDirPathFromFilePath(filePath: string) {
+    static getDirPathFromFilePath(filePath: string) {
         let tArr = filePath.split(/\/|(\\\\)/)
             .filter(i => i)         // 有可能包含undefined
         tArr.pop()

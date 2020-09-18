@@ -5,6 +5,7 @@ export class View {
     childs:View[]
     params:Map<string,string> 
     jsonParams:any = {}
+    components?:any[]
     constructor(name:string) {
         this.name = name
         this.childs = []

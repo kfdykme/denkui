@@ -1,3 +1,4 @@
+import { FileLoader } from "../core/FileLoader.ts"
 import { View } from "../data/View.ts" 
 import logger from '../log/console.ts'
 const STATUS_WAIT_TAG_START = 1
@@ -33,19 +34,39 @@ export default class TagParser {
 
     path(path:string):View {
         return this.in(
-            textDecoder.decode(Deno.readFileSync(path)))
+            textDecoder.decode(Deno.readFileSync(path)), path)
     }
 
-    in(fileContent:string):View {
+    in(fileContent:string, filePath:string):View {
         let templateReg = /\<template\>(.|\r|\n|\r\n)*?\<\/template>/
-
+        let view = new View("no template element")
         let result 
         result = fileContent.match(templateReg)
         if (result && result.length > 1) {
             let templateContent = result[0]
-            return this.readTag(templateContent)
+            view =  this.readTag(templateContent)
         }
-        return new View("no template element")
+        
+        let importReg = /<import +name="(.*?)" +src="(.*?)"><\/import>/g
+        let importViews =fileContent.match(importReg)
+        
+        view.components = importViews?.map((i:string) => {
+            
+            let [content, name, src] = /<import +name="(.*?)" +src="(.*?)"/.exec(i)?? [i,i,i]
+            return {
+                name,
+                src: FileLoader.getDirPathFromFilePath(filePath) + src + '.ux'
+            }
+        }).map((o:any) => {
+            let module = this.path(o.src)
+            console.info(module.toString())
+            return {
+                name: o.name,
+                module
+            }
+        })
+        console.info("TagPerseDebug",  view.components)
+        return view
     }
 
     createNode(name:string):View {
