@@ -1,7 +1,7 @@
 export class View {
 
     name:string 
-    content:string = ''
+    content?:string = ''
     childs:View[]
     params:Map<string,string> 
     jsonParams:any = {}
