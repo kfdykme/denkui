@@ -1,3 +1,4 @@
+ 
 export class View {
 
     name:string 
@@ -5,11 +6,12 @@ export class View {
     childs:View[]
     params:Map<string,string> 
     jsonParams:any = {}
-    components?:any[]
+    components?:View[] 
     constructor(name:string) {
         this.name = name
         this.childs = []
         this.params = new Map()
+        this.components = []
     }
 
     addContent (content:string) {
@@ -102,11 +104,11 @@ export class View {
 
     eval(context:any, showContext:Boolean = true) {
         if (showContext)
-            console.info('View eval context:', context)
+            console.info('View eval context:', this.format.call(context))
         this.params.forEach((value, key) => {
             value = this.innerEval(value, context)
             this.jsonParams[key] = value
-            console.info("View eval ", key,value)
+            // console.info("View eval ", key,value)
         }) 
         this.childs.forEach(child => {
             child.eval(context, false)
@@ -115,6 +117,8 @@ export class View {
 
     
     format(level:number = 0) {
+        return JSON.stringify(this,null,2)//.replace(/(\{|,|\}|("[a-z]+": (("")|(\[\])|(\{\})))|\[|\])/g,'').split(/(\r\n)|\r|\n/g).filter(i => i != "\n").join("\n")
+
         let arr = new Array(level).fill(' ')
         let res = this.name
         this.childs.forEach(child => {

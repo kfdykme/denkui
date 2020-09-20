@@ -51,19 +51,16 @@ export default class TagParser {
         let importViews =fileContent.match(importReg)
         
         view.components = importViews?.map((i:string) => {
-            
             let [content, name, src] = /<import +name="(.*?)" +src="(.*?)"/.exec(i)?? [i,i,i]
             return {
                 name,
                 src: FileLoader.getDirPathFromFilePath(filePath) + src + '.ux'
             }
         }).map((o:any) => {
-            let module = this.path(o.src)
+            let module:View = this.path(o.src)
             console.info(module.toString())
-            return {
-                name: o.name,
-                module
-            }
+            module.name = o.name
+            return module
         })
         console.info("TagPerseDebug",  view.components)
         return view

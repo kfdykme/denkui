@@ -1,5 +1,5 @@
 import { View } from "../../data/View.ts"
-
+import logger from '../../log/console.ts'
 let sInstance:DataBinder|null = null
 
 export declare interface UxData {
@@ -33,10 +33,10 @@ export class DataBinder {
         if (sInstance == null) {
             sInstance = new DataBinder()
             sInstance.addSetCallback((key:string,value:string) => {
-                console.info("DataBinder bind data SET :", key, "->",value)
+                logger.info("DataBinder bind data SET :", key, "->",value)
             })
             sInstance.addGetCallback((key:string,value:string) => {
-                console.info("DataBinder bind data GET :", key, "->", value)    
+                logger.info("DataBinder bind data GET :", key, "->", value)    
             })
         }
         return sInstance
@@ -65,14 +65,14 @@ export class DataBinder {
     _innerBind(page:any, app:Application, type:string) {
         let dataBinder = this
         for (let x in page[type]) {
-            console.info("DataBinder bind data ", x, 'has defined: ', this.map.get(x))
+            logger.info("DataBinder bind data ", x, 'has defined: ', this.map.get(x))
             if (this.map.get(x) === undefined || 
                 this.map.get(x) === false)
 
                 Object.defineProperty(page, x, {
                     set: function(value) {
                         page[type][x] = value
-                        console.info(`DataBinder on set page._view == null:${page._view == null}:${x}->${value}`)
+                        logger.info(`DataBinder on set page._view == null:${page._view == null}:${x}->${value}`)
                         page._view?.replace(x, value)
                         //callback 
                         dataBinder.setCallbacks.forEach((f:Function) => f(x,value))
@@ -80,7 +80,7 @@ export class DataBinder {
                     get: function() {
                         let value = page[type][x]
                         
-                        console.info(`DataBinder on get page._view == null:${page._view == null}:${x}->${value}`)
+                        logger.info(`DataBinder on get page._view == null:${page._view == null}:${x}->${value}`)
                         page._view?.replace(x, value)
                         dataBinder.getCallbacks.forEach((f:Function) => f(x, value))
                         return value
@@ -105,7 +105,7 @@ export class DataBinder {
             Object.defineProperty(page, '$app', {
                 set: function (value) {
                     // dataBinder.getCallbacks.forEach((f:Function) => f('$app', value))
-                    console.info("Can't change $app")
+                    logger.info("Can't change $app")
                 },
                 get: function () {
                     // dataBinder.setCallbacks.forEach((f:Function) => f('$app',app.app))
