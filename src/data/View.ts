@@ -104,7 +104,7 @@ export class View {
 
     eval(context:any, showContext:Boolean = true) {
         if (showContext)
-            console.info('View eval context:', this.format.call(context))
+            console.info('View eval context:', context)
         this.params.forEach((value, key) => {
             value = this.innerEval(value, context)
             this.jsonParams[key] = value
