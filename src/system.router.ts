@@ -22,6 +22,10 @@ let pageMap = {};
 let app : AppLoader;
 let uxLoader = new UxLoader();
 
+export enum Mode {
+    PUSH,
+    REPLACE
+}
 
 /**
  * replace
@@ -32,7 +36,7 @@ const replace = async (obj:any) => {
         
     let appPage = await uxLoader.load(obj.uri, app)
     pageStack.pop()
-    await addPageIntoStack(appPage)
+    await addPageIntoStack(appPage, Mode.REPLACE)
     // pageStack.forEach((i:any) => {
     //     logger.info(i)
     // })
@@ -40,18 +44,18 @@ const replace = async (obj:any) => {
     return appPage
 }
 
-const attach = async (page:any) => {
+const attach = async (page:any, mode:Mode) => {
     return await  LifeCycleController.getInstance()
-    .attachView(page)
+    .attachView(page, mode)
 }
 
-const addPageIntoStack = async (page:any) => {
+const addPageIntoStack = async (page:any, mode:Mode = Mode.PUSH) => {
     pageStack.push(page)
   
     app.currentPage = page
     console.info("SYSTEM.ROUTER addPageIntoStack :", app.currentPage)
  
-    await attach(page)
+    await attach(page, mode)
 
     app.currentPage.onInit()
 }

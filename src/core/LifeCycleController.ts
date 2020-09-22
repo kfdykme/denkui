@@ -2,6 +2,7 @@ import IpcController from '../ipc/IpcController.ts';
 import {AppLoader} from '../core/AppLoader.ts';
 import {DataBinder,UxData} from '../core/binder/DataBinder.ts'
 import logger from '../log/console.ts'
+import {Mode} from '../system.router.ts'
 
 let sInstance:LifeCycleController|null = null
 
@@ -53,7 +54,7 @@ export default class LifeCycleController {
         if (this.currentPage == null) {
             return this.emptyFunction
         }
-
+     
         if (typeof (this.currentPage as any)[method] == 'function') {
             return (this.currentPage as any)[method]
         }
@@ -74,6 +75,13 @@ export default class LifeCycleController {
         if (event['mod'] == 'invoke') {
             this.invoke(event['function'], JSON.parse(event['param']))
         }
+    }
+
+    prompt(o:any) {
+        this.ipc?.send(JSON.stringify({
+            method: 'PROMPT',
+            data: o?.message
+        }))
     }
 
     start() {
@@ -120,14 +128,16 @@ export default class LifeCycleController {
         appLoader.load('app.ux')
     }
 
-    async attachView(appPage:any) {
+    async attachView(appPage:any, mode:Mode = Mode.PUSH) {
         this.currentPage = appPage
         return new Promise((reslove, rejcet) => {
             this.attachViewCallback =  () => {
                 reslove()
             }
             this.ipc?.send(JSON.stringify({
-                method:'RENDER_VIEW',
+                method: mode === Mode.PUSH ?
+                    'RENDER_VIEW' :
+                    'RENDER_VIEW_REPLACE',
                 data:appPage?.renderView()
             }))
     
