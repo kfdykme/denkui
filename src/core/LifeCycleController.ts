@@ -67,13 +67,21 @@ export default class LifeCycleController {
         let methodFunc:Function = this.getCurrentPageMethod(method)
         logger.info(methodFunc)
         methodFunc.call(this.currentPage, event) 
+     
         logger.info("LifeCycleController try invoke end: ", method) 
     }
 
     handleEvent(event: any) {
         console.info("HANDLE ", event)
         if (event['mod'] == 'invoke') {
-            this.invoke(event['function'], JSON.parse(event['param']))
+            let value:any = event['param']
+            try {
+                value = JSON.parse(event['param'])
+            } catch (error) {
+                console.error(error)
+            }
+            
+            this.invoke(event['function'], value)
         }
     }
 

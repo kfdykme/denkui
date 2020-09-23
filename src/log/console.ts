@@ -14,7 +14,7 @@ const filters:string[] = [
     "IpcController",
     "FETCH",
     'HANDLE',
-    "LifeCycleController"
+    // "LifeCycleController",
 ]
 
 const isFilted = (...vars:any[]) => {
