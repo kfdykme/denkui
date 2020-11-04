@@ -7,6 +7,9 @@ export class View {
     params:Map<string,string> 
     jsonParams:any = {}
     components?:View[] 
+
+    // 保存一下组件的src路径
+    src:string = ""
     constructor(name:string) {
         this.name = name
         this.childs = []

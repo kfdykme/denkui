@@ -22,6 +22,8 @@ let pageMap = {};
 let app : AppLoader;
 let uxLoader = new UxLoader();
 
+let components:any[] = [];
+
 export enum Mode {
     PUSH,
     REPLACE
@@ -58,6 +60,12 @@ const addPageIntoStack = async (page:any, mode:Mode = Mode.PUSH) => {
     await attach(page, mode)
 
     app.currentPage.onInit()
+
+    // 处理组件
+    app.currentPage?._view?.components?.forEach(async (view:any) => {
+        console.info("SYSTEM.ROUTER init components:", 
+        await uxLoader.load(view.src, app))
+    })
 }
 
 const push = async (obj:any) => {

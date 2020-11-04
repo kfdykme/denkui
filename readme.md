@@ -2,6 +2,12 @@
  * @Author: kfdykme
 --> 
 
+### START
+
+```bash
+deno run -A .\\src\\test\\testLife.ts
+```
+
 ### 介绍
 
 目标是实现一个跨平台的前端转桌面应用的套件。
@@ -22,10 +28,15 @@
 ### TODO
 
 - view树 [DONE]
-- css渲染树
+- view 与 deno的交互 [DONE]
+- 生命周期保证 [DONE]
+- 组件
+    - 组件内的View
+    - 组件内的Context
+- 条件渲染
+- 迭代渲染
 - 合并
-- view 与 deno的交互
-- 生命周期保证
+- css渲染树
 
 TODO MODULE | TODO TASK | TASK STAUS 
 --- | --- | --- | 
