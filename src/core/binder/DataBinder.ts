@@ -99,22 +99,60 @@ export class DataBinder {
         this._innerBind(page, app, 'protected')
         this._innerBind(page, app, 'public')
 
-        if (this.map.get('$app' + page._route) === undefined || 
-        this.map.get('$app' + page._route) === false) 
+        this.bindTag('$app' + page._route,
+        page,
+        app.app,
+        '$app') 
+    }
+
+    bindComponent(page:UxData, comp:UxData, app:Application) {
+        this.bindTag('$app' + page._route + comp._route,
+        comp,
+        app.app,
+        '$app')
+
+        this.bindTag('$broadcast' + page._route + comp._route,
+        comp,
+        (arg1:any, arg2:any) => {
+            // TODO: 待实现
+            console.info('BROADCAST',arg1, arg2) 
+        },
+        '$broadcast'
+        )
+
+        this.bindTag('$on' + page._route + comp._route,
+        comp,
+        (arg1:any, arg2:any) => {
+            // TODO: 待实现
+            console.info('ON',arg1, arg2)
+        },
+        '$on'
+        ) 
+    }
+
+    bindTag(key:string, target:any, value:any, tag:string) {
+        if (this._hasDefine(key)) 
         {
-            Object.defineProperty(page, '$app', {
+            Object.defineProperty(target, tag, {
                 set: function (value) {
-                    // dataBinder.getCallbacks.forEach((f:Function) => f('$app', value))
-                    logger.info("Can't change $app")
+                    logger.info("Can't change " + tag)
                 },
                 get: function () {
-                    // dataBinder.setCallbacks.forEach((f:Function) => f('$app',app.app))
-                    return app.app
+                    return value
                 }
             })
  
         }
-        this.map.set('$app' + page._route, true)
+        this._setDefine(key)
+    }
+
+    _hasDefine(key: string) {
+        return (this.map.get(key) === undefined || 
+        this.map.get(key) === false)
+    }
+
+    _setDefine(key: string) {
+        this.map.set(key, true)
     }
 }
  
