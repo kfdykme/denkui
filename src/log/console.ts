@@ -14,6 +14,8 @@ const filters:string[] = [
     "IpcController",
     "FETCH",
     'HANDLE',
+    'UxLoader',
+    'SYSTEM.ROUTER init components:',
     // "LifeCycleController",
 ]
 

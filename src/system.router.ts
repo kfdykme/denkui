@@ -62,10 +62,22 @@ const addPageIntoStack = async (page:any, mode:Mode = Mode.PUSH) => {
     app.currentPage.onInit()
 
     // 处理组件
-    app.currentPage?._view?.components?.forEach(async (view:any) => {
-        console.info("SYSTEM.ROUTER init components:", 
-        await uxLoader.load(view.src, app))
-    })
+    try {
+        
+        app.currentPage.components = app.currentPage?._view?.components?.map(async (view:any) => {
+            let comp = await uxLoader.loadComponent(app.currentPage, view.src, app)
+            console.info("SYSTEM.ROUTER init components:",
+            view.src, comp) 
+
+            comp.onInit && comp.onInit()
+            return comp
+        })
+        
+    } catch (err) {
+        console.info("SYSTEM.ROUTER addPageIntoStack error while initComponent", err)
+    }
+
+
 }
 
 const push = async (obj:any) => {
