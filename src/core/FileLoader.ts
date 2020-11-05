@@ -62,7 +62,7 @@ export class FileLoader {
         let targetJsFilePath = ''
         if (tag.content !== '') {
             content = tag.content
-            targetJsFilePath = FileLoader.getDirPathFromFilePath(path) + 'index.js' 
+            targetJsFilePath = FileLoader.getDirPathFromFilePath(path) + this.getNameFromFilePath(path) + '.js' 
         } else if (tag.params.src) { 
             let dirPath = FileLoader.getDirPathFromFilePath(realPath)
             content = this.decoder.decode(Deno.readFileSync(
@@ -86,12 +86,18 @@ export class FileLoader {
      * 1. 如果加载的是js文件, 加载该js文件,拷贝到输出目录,并返回处理过的结果和路径
      * 2. 如果加载的不是js文件(暂时默认当做ux文件), 加载该js文件,拷贝script标签的内容到输出目录,并返回处理的结果和路径
      * @param path 加载的文件的相对与SOURCE_ROOT_PATH的路径
+     * @param isRemoveRoot 是否在路径前加上${SROUCE_ROOT_PATH} 默认 true
      */
-    load(path:string) {
-        logger.info('FileLoader load', path)
-        //0 find target file from source dir
-        let loadPath = SOURCE_ROOT_PATH + path 
+    load(path:string, isRemoveRoot:boolean = false) {
         
+        if (isRemoveRoot) {
+            path = path.substring(path.indexOf(SOURCE_ROOT_PATH) + SOURCE_ROOT_PATH.length)
+        }
+
+        logger.info('FileLoader load', path)
+        
+        //0 find target file from source dir
+        let loadPath = SOURCE_ROOT_PATH + path
         logger.info('FileLoader load', 'try load file: ' + loadPath)
         //1 load file content
         let content = new TextDecoder('utf-8').decode(Deno.readFileSync(loadPath))
