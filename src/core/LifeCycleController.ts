@@ -1,5 +1,5 @@
 import IpcController from '../ipc/IpcController.ts';
-import {AppLoader} from '../core/AppLoader.ts';
+import {AppLoader} from './loader/AppLoader.ts';
 import {DataBinder,UxData} from '../core/binder/DataBinder.ts'
 import logger from '../log/console.ts'
 import {Mode} from '../system.router.ts'

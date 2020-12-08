@@ -11,9 +11,9 @@
  */
 
 import logger from './log/console.ts'
-import {FileLoader} from './core/FileLoader.ts'
+import {FileLoader} from './core/loader/FileLoader.ts'
 import {UxLoader} from './core/loader/UxLoader.ts'
-import {AppLoader} from './core/AppLoader.ts'
+import {AppLoader} from './core/loader/AppLoader.ts'
 import LifeCycleController from './core/LifeCycleController.ts'
  
 let count = 0

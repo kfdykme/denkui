@@ -1,4 +1,4 @@
-import { FileLoader } from '../FileLoader.ts'
+import { FileLoader } from './FileLoader.ts'
 import { DataBinder, UxData } from '../binder/DataBinder.ts'
 import logger from '../../log/console.ts'
 import { View } from '../../data/View.ts'
