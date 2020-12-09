@@ -1,4 +1,4 @@
-import TagParser from '../parser/TagParser.ts' 
+import TagParser from '@/parser/TagParser.ts' 
 
 let parser = new TagParser()
  

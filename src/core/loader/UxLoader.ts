@@ -1,7 +1,7 @@
-import { FileLoader } from './FileLoader.ts'
-import { DataBinder, UxData } from '../binder/DataBinder.ts'
-import logger from '../../log/console.ts'
-import { View } from '../../data/View.ts'
+import { FileLoader } from '@/core/loader/FileLoader.ts'
+import { DataBinder, UxData } from '@/core/binder/DataBinder.ts'
+import logger from '@/log/console.ts'
+import { View } from '@/data/View.ts'
 
 export class UxLoader {
 

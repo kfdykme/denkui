@@ -1,6 +1,6 @@
 
-import logger from './log/console.ts'
-import LifeCycleController from './core/LifeCycleController.ts'
+import logger from '@/log/console.ts'
+import LifeCycleController from '@/core/LifeCycleController.ts'
  
 export default {
     showToast: (o:any) => { 

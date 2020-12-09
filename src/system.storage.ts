@@ -2,7 +2,7 @@
  * @Author: kfdykme
  */
 
-import logger from './log/console.ts'
+import logger from '@/log/console.ts'
 const STORAGE_PATH = '~/.denkui/storage.json'
 const docoder = new TextDecoder('utf-8')
 const encoder = new TextEncoder()

@@ -1,7 +1,7 @@
 /*
  * @Author: kfdykme
  */
-import {FileLoader} from '../core/FileLoader.ts'
+import {FileLoader} from '@/core/FileLoader.ts'
 
 
 let path = 'Common/ForumApi.js'

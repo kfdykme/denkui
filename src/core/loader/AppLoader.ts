@@ -2,10 +2,10 @@
  * @Author: kfdykme
  */
 
-import {FileLoader} from './FileLoader.ts'
-import ManifestLoader from './ManifestLoader.ts'
-import router from '../../system.router.ts'
-import logger from '../../log/console.ts'
+import {FileLoader} from '@/core/loader/FileLoader.ts'
+import ManifestLoader from '@/core/loader/ManifestLoader.ts'
+import router from '@/system.router.ts'
+import logger from '@/log/console.ts'
 export class AppLoader{
     
     appPath :string = ''

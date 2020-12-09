@@ -1,8 +1,8 @@
-import IpcController from '../ipc/IpcController.ts';
-import {AppLoader} from './loader/AppLoader.ts';
-import {DataBinder,UxData} from '../core/binder/DataBinder.ts'
-import logger from '../log/console.ts'
-import {Mode} from '../system.router.ts'
+import IpcController from '@/ipc/IpcController.ts';
+import {AppLoader} from '@/core/loader/AppLoader.ts';
+import {DataBinder,UxData} from '@/core/binder/DataBinder.ts'
+import logger from '@/log/console.ts'
+import {Mode} from '@/system.router.ts'
 
 let sInstance:LifeCycleController|null = null
 

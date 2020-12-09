@@ -1,4 +1,4 @@
-import IpcController from '../ipc/IpcController.ts'
+import IpcController from '@/ipc/IpcController.ts'
 
 
 let ipc:IpcController = new IpcController(8089);

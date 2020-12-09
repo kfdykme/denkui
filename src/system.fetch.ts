@@ -9,7 +9,7 @@
  // bbs 的api需要将header设置为application/x-www-form-urlencoded; 所以没定
  
 
-import logger from './log/console.ts'  
+import logger from '@/log/console.ts'  
 export default {
     fetch: async (o:any)=> {
         logger.info('FETCH fetch', o)

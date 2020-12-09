@@ -1,6 +1,6 @@
-import { FileLoader } from "../core/loader/FileLoader.ts"
-import { View } from "../data/View.ts" 
-import logger from '../log/console.ts'
+import { FileLoader } from "@/core/loader/FileLoader.ts"
+import { View } from "@/data/View.ts" 
+import logger from '@/log/console.ts'
 const STATUS_WAIT_TAG_START = 1
 const STATUS_TAG_START = 2
 const STATUS_TAG_PARAM_START = 3

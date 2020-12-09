@@ -1,5 +1,5 @@
 import { WebSocket, WebSocketServer } from "https://deno.land/x/websocket@v0.0.3/mod.ts";
-import logger from '../log/console.ts'
+import logger from '@/log/console.ts'
 
 export default class IpcController {
     

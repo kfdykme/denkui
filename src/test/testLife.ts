@@ -1,4 +1,4 @@
-import LifeCycleController from '../core/LifeCycleController.ts';
+import LifeCycleController from '@/core/LifeCycleController.ts';
 
 
 let lc = LifeCycleController.getInstance()

@@ -2,7 +2,7 @@
  * @Author: kfdykme
  */
 
-import logger from '../../log/console.ts'
+import logger from '@/log/console.ts'
 const MANIFEST_FILE_NAME = 'manifest.json'
 
 export default class ManifestLoader {

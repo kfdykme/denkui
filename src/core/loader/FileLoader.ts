@@ -1,9 +1,9 @@
 
-import ManifestLoader from './ManifestLoader.ts'
-import {readTag} from '../TagReader.ts'
-import logger from '../../log/console.ts'
-import TagParser from '../../parser/TagParser.ts'
-import { View } from '../../data/View.ts'
+import ManifestLoader from '@/core/loader/ManifestLoader.ts'
+import {readTag} from '@/core/TagReader.ts'
+import logger from '@/log/console.ts'
+import TagParser from '@/parser/TagParser.ts'
+import { View } from '@/data/View.ts'
 
 const CODE_PATH = 'src/'
 const MIDDLE_JS_OUTPUT_PATH = './intermediate/js/' + CODE_PATH

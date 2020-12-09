@@ -1,5 +1,5 @@
-import { View } from "../../data/View.ts"
-import logger from '../../log/console.ts'
+import { View } from "@/data/View.ts"
+import logger from '@/log/console.ts'
 let sInstance:DataBinder|null = null
 
 export declare interface UxData {

@@ -5,8 +5,8 @@
  * @Author: kfdykme
  */
 
-import TagData from '../data/TagData.ts'
-import logger from '../log/console.ts'
+import TagData from '@/data/TagData.ts'
+import logger from '@/log/console.ts'
 
 let readTag = (tag:string, path:string,content:string = ''):TagData => {
     logger.info('TAGREADER readTag', tag, path, content)

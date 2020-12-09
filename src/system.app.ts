@@ -3,7 +3,7 @@
  */
 
 
-import logger from './log/console.ts'
+import logger from '@/log/console.ts'
 export default {
     appInfo: () => {
         return {
