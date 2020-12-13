@@ -4,13 +4,14 @@ import {readTag} from '@/core/TagReader.ts'
 import logger from '@/log/console.ts'
 import TagParser from '@/parser/TagParser.ts'
 import { View } from '@/data/View.ts'
+import LoaderManager from '@/core/loader/LoaderManager.ts'
+
 
 const CODE_PATH = 'src/'
 const MIDDLE_JS_OUTPUT_PATH = './intermediate/js/' + CODE_PATH
 const SOURCE_ROOT_PATH = '../bbs-quick/' + CODE_PATH
 
-
-let sInstance:FileLoader|null = null
+ 
 export class FileLoader {
     decoder:TextDecoder
     encoder:TextEncoder
@@ -20,10 +21,7 @@ export class FileLoader {
     }
 
     static getInstance() {
-        if (sInstance === null) {
-            sInstance = new FileLoader()
-        }
-        return sInstance
+        return LoaderManager.get().fileLoader
     }
 
     /**

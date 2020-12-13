@@ -138,7 +138,7 @@ export default class LifeCycleController {
 
     async attachView(appPage:any, mode:Mode = Mode.PUSH) {
         this.currentPage = appPage
-        return new Promise((reslove, rejcet) => {
+        return new Promise<void>((reslove, rejcet) => {
             this.attachViewCallback =  () => {
                 reslove()
             }
