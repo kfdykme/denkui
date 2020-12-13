@@ -42,5 +42,8 @@ export default  {
     log:(...vars: any[]) => {
         if(isFilted(vars)) return
         console.log(new Date(), ...vars)
+    },
+    dev:(...vars: any[]) => { 
+        console.log(new Date(), ...vars)
     }
 }

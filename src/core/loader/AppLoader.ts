@@ -22,7 +22,7 @@ export class AppLoader{
     }
 
     async load(appPath:string) {
-        appPath = '../../' +FileLoader.getInstance().load(appPath).path
+        appPath = '../../../' +FileLoader.getInstance().load(appPath).path
         logger.info('AppLoader load', appPath)
         // logger.info('AppLoader load', this.rootPath)
         let appModule = await import(appPath)

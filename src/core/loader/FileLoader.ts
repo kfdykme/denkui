@@ -53,30 +53,45 @@ export class FileLoader {
     loadUx(path:string) {
         logger.info("FileLoader loadUx", path)
         //1 get script content or src attr 
+        let tagScript = this.loadTag('script', path)
+        let tagStyle = this.loadTag('style', path)
+        return {
+            style: tagStyle,
+            content: tagScript.content,
+            relativePath: tagScript.targetFilePath
+        }
+    }
+
+    private loadTag(tagName:string, path:string) {
         let realPath = SOURCE_ROOT_PATH + path
-        let tag = readTag('script', realPath)
-        logger.info('FileLoader tag', tag,realPath)
+        let tag = readTag(tagName, realPath)
+        logger.info('FileLoader load ', tagName, tag,realPath)
         let content = ''
-        let targetJsFilePath = ''
+        let targetFilePath = ''
         if (tag.content !== '') {
             content = tag.content
-            targetJsFilePath = FileLoader.getDirPathFromFilePath(path) + this.getNameFromFilePath(path) + '.js' 
+            targetFilePath = FileLoader.getDirPathFromFilePath(path) + this.getNameFromFilePath(path) + '.' + tagName 
         } else if (tag.params.src) { 
             let dirPath = FileLoader.getDirPathFromFilePath(realPath)
             content = this.decoder.decode(Deno.readFileSync(
                 dirPath + tag.params.src
             ))
-            targetJsFilePath = FileLoader.getDirPathFromFilePath(path) + tag.params.src 
+            targetFilePath = FileLoader.getDirPathFromFilePath(path) + tag.params.src 
         } else {
-            logger.error("FileLoader loadUx", 'fail')
+            logger.error("FileLoader loadTag", 'fail')
+        }
+        logger.info('FileLoader load tag content ', targetFilePath)
+           
+        if (targetFilePath != '') {
+
+            Deno.mkdirSync(MIDDLE_JS_OUTPUT_PATH +  FileLoader.getDirPathFromFilePath(path), { recursive: true})
+            logger.info('FileLoader load into ', targetFilePath)
+            Deno.writeFileSync(MIDDLE_JS_OUTPUT_PATH + targetFilePath, this.encoder.encode(content))
         }
 
-        Deno.mkdirSync(MIDDLE_JS_OUTPUT_PATH +  FileLoader.getDirPathFromFilePath(path), { recursive: true})
-        Deno.writeFileSync(MIDDLE_JS_OUTPUT_PATH + targetJsFilePath, this.encoder.encode(content))
-
         return {
-            content: content,
-            relativePath: targetJsFilePath
+            content:content,
+            targetFilePath: targetFilePath
         }
     }
 
@@ -123,20 +138,19 @@ export class FileLoader {
 
         // 2 load ux file
             res = this.loadUx(path)
-            
+            let style = res.style
         //parser tempalte 
             let view:View = TagParser.getInstance().path(loadPath)
         // 3 change path from ux to js
             path = res.relativePath
 
         // 4 loadContent for a js file
-            res = this.loadContent(res.content, path)
-
+            res = this.loadContent(res.content, path) 
         // 5 
             Deno.writeFileSync(MIDDLE_JS_OUTPUT_PATH + path ,
                 this.encoder.encode(res.content))
             return {
-
+                style,
                 view:view,
                 content: res.content,
                 path:MIDDLE_JS_OUTPUT_PATH + path
