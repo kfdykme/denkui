@@ -55,7 +55,7 @@ const addPageIntoStack = async (page:any, mode:Mode = Mode.PUSH) => {
     pageStack.push(page)
   
     app.currentPage = page
-    console.info("SYSTEM.ROUTER addPageIntoStack :", app.currentPage)
+    logger.info("SYSTEM.ROUTER", "addPageIntoStack :", app.currentPage)
  
     await attach(page, mode)
 

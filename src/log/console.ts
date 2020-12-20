@@ -4,7 +4,7 @@ const filters:string[] = [
     // 'FileLoader load loadSystem',
     // 'FileLoader load mport:',
     // 'FileLoader tag',
-    // 'AppLoader',
+    'AppLoader',
     "DataBinder",
     'makeSureDir',
     'TAGREADER',
@@ -15,7 +15,7 @@ const filters:string[] = [
     "FETCH",
     'HANDLE',
     'UxLoader',
-    'SYSTEM.ROUTER init components:',
+    'SYSTEM.ROUTER',
     // "LifeCycleController",
 ]
 

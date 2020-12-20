@@ -5,3 +5,6 @@ dist/**/*
 
 //node module
 node_modules
+
+//vscode
+.vscode

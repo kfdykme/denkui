@@ -5,11 +5,12 @@ import logger from '@/log/console.ts'
 import TagParser from '@/parser/TagParser.ts'
 import { View } from '@/data/View.ts'
 import LoaderManager from '@/core/loader/LoaderManager.ts'
-
+import LoadTagResult from '@/data/LoadTagResult.ts'
 
 const CODE_PATH = 'src/'
 const MIDDLE_JS_OUTPUT_PATH = './intermediate/js/' + CODE_PATH
 const SOURCE_ROOT_PATH = '../bbs-quick/' + CODE_PATH
+
 
  
 export class FileLoader {
@@ -53,8 +54,8 @@ export class FileLoader {
     loadUx(path:string) {
         logger.info("FileLoader loadUx", path)
         //1 get script content or src attr 
-        let tagScript = this.loadTag('script', path)
-        let tagStyle = this.loadTag('style', path)
+        const tagScript = this.loadTag('script', path)
+        const tagStyle = this.loadTag('style', path)
         return {
             style: tagStyle,
             content: tagScript.content,
@@ -62,9 +63,9 @@ export class FileLoader {
         }
     }
 
-    private loadTag(tagName:string, path:string) {
-        let realPath = SOURCE_ROOT_PATH + path
-        let tag = readTag(tagName, realPath)
+    private loadTag(tagName:string, path:string): LoadTagResult {
+        const realPath = SOURCE_ROOT_PATH + path
+        const tag = readTag(tagName, realPath)
         logger.info('FileLoader load ', tagName, tag,realPath)
         let content = ''
         let targetFilePath = ''
@@ -72,7 +73,7 @@ export class FileLoader {
             content = tag.content
             targetFilePath = FileLoader.getDirPathFromFilePath(path) + this.getNameFromFilePath(path) + '.' + tagName 
         } else if (tag.params.src) { 
-            let dirPath = FileLoader.getDirPathFromFilePath(realPath)
+            const dirPath = FileLoader.getDirPathFromFilePath(realPath)
             content = this.decoder.decode(Deno.readFileSync(
                 dirPath + tag.params.src
             ))
@@ -89,10 +90,7 @@ export class FileLoader {
             Deno.writeFileSync(MIDDLE_JS_OUTPUT_PATH + targetFilePath, this.encoder.encode(content))
         }
 
-        return {
-            content:content,
-            targetFilePath: targetFilePath
-        }
+        return new LoadTagResult(content, targetFilePath)
     }
 
     /**
@@ -139,8 +137,9 @@ export class FileLoader {
         // 2 load ux file
             res = this.loadUx(path)
             let style = res.style
+            style = LoaderManager.get().cssLoader.loadTag(style)
         //parser tempalte 
-            let view:View = TagParser.getInstance().path(loadPath)
+            const view:View = TagParser.getInstance().path(loadPath)
         // 3 change path from ux to js
             path = res.relativePath
 

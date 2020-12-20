@@ -63,7 +63,7 @@ export default class TagParser {
             module.src = o.src
             return module
         })
-        console.info("TagPerseDebug",  view.components)
+        // console.info("TagPerseDebug",  view.components)
         return view
     }
 
