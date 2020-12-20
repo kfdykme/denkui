@@ -32,13 +32,11 @@ export default class CssLoader {
 
     name:string = "CssLoader"
 
-    
+    globalCssMap:Map<string,any> = new Map
 
     static get() {
         return LoaderManager.get().cssLoader
     }
-    
-
 
     public loadTag(tag: LoadTagResult) {
         logger.dev('loadTag', tag)
@@ -62,7 +60,7 @@ export default class CssLoader {
                     preHeader = cssStack.top().header
                 }
                 cssItem = {
-                    header: [preHeader,getHeaderFromLine(line)].join(' '),
+                    header: [preHeader,getHeaderFromLine(line)].join(' ').trim(),
                     body:[]
                 }
                 cssStack.push(cssItem)
@@ -86,6 +84,21 @@ export default class CssLoader {
                             .filter(filterStringNotEmpty)
                             .forEach(loadCssLines)
         logger.dev('res', cssRes)
+
+        this.addCss(cssRes)
     }
 
+    private addCss(cssList: any[]) {
+        cssList.forEach((item:any) => {
+            this.globalCssMap.set(item.header, item)
+        })
+    }
+
+    public getCss(tag:string) {
+        return this.globalCssMap.get(tag)
+    }
+
+    private cssSize() {
+        return this.globalCssMap.size
+    }
 }  

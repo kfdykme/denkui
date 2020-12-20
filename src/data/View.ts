@@ -1,4 +1,86 @@
+import Filters from '@/filter/Filters.ts'
+import LoaderManager from '@/core/loader/LoaderManager.ts'
+/**
+ * 用于标记View的Css标签
+ */
+export class CssView {
+    targetView: View
+    cssTagsList: string[] = []
+
+    constructor (target:View) {
+        this.targetView = target
+    }
+
+    /**
+     * 
+     * @param tag 
+     * @return {Boolean} tag是否已经存在
+     */
+    addTag(tag:string):boolean {
+        if (this.hasTag(tag)) {
+            this.cssTagsList.push(tag)
+            return false;
+        }
+        return true;
+    }
+
+    hasTag(tag:string):boolean {
+        return this.cssTagsList.indexOf(tag) === -1
+    }
+}
+
+export class CssHelper {
+    static class(view:View): string {
+        try {
+            if ( view?.jsonParams?.class != undefined) {
+                return '.' + view?.jsonParams?.class
+            } else {
+                return ""
+            }
+        } catch (err) {
+            return ""
+        }
+    }
  
+    static LoadStyleByCssTag(tag:string):string {
+        return LoaderManager.get().cssLoader.getCss(tag)
+    }
+
+    static  buildStyle(view:View, superData:any) {
+         
+        // FIXME 这部分的逻辑还不完善
+        const superClass = CssHelper.class(view)
+        // console.info(superClass)
+        let styleTagSuperClass = [superData.superClass, superClass].join(' ')
+        if (superClass === "") {
+            styleTagSuperClass = ""
+        }
+        const styleTagSuperAndName = [superData.superClass, this.name].join(' ')
+        const styleTagSuperDirectName = [superData.superClass, '>' + this.name].join(' ')
+        
+        view.styleTags = [
+            this.name,
+            styleTagSuperClass,
+            styleTagSuperDirectName,
+            styleTagSuperAndName
+        ]
+        .filter(Filters.FilterNotEmptyText)
+        .map((text:string) => {
+            return text.trim()
+        })
+        .map((text:string) => {
+            return CssHelper.LoadStyleByCssTag(text)
+        })
+        .filter(Filters.FilterNotUndefined)
+
+        return styleTagSuperClass
+    }
+}
+
+/**
+ * className View
+ * 记录用于在Flutter层进行渲染的数据结构
+ */ 
 export class View {
 
     name:string 
@@ -7,6 +89,8 @@ export class View {
     params:Map<string,string> 
     jsonParams:any = {}
     components?:View[] 
+    superData:any = {}
+    styleTags:string[] = []
 
     // 保存一下组件的src路径
     src:string = ""
@@ -29,7 +113,7 @@ export class View {
     /**
      * 处理name , param 等内容
      */
-    build() {
+    build(superData:any = {}) {
         let nameReg = /\<(([a-z]|-)+)?( |\n|\>)/
         let res:any = nameReg.exec(this.name)
         let template = this.name
@@ -54,10 +138,19 @@ export class View {
         // console.info( this.content,this.content.match(contentReg))
         res = this.content.match(contentReg)
         this.content = res ? res[1] : '' 
+       
+        let styleTagSuperClass = CssHelper.buildStyle(this, superData)
+        
+        console.info('styleTags', this.styleTags)
         this.childs.forEach((child:View) => {
-            child.build()
+            child.build({
+                superParams: this.params,
+                superName: this.name,
+                superClass: styleTagSuperClass    
+            })
         })
     }
+ 
 
     deleteNull() {
         if (this.content == "") delete(this.content)
