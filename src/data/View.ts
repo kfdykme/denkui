@@ -46,7 +46,7 @@ export class CssHelper {
         return LoaderManager.get().cssLoader.getCss(tag)
     }
 
-    static  buildStyle(view:View, superData:any) {
+    static buildStyle(view:View, superData:any) {
          
         // FIXME 这部分的逻辑还不完善
         const superClass = CssHelper.class(view)
@@ -55,11 +55,11 @@ export class CssHelper {
         if (superClass === "") {
             styleTagSuperClass = ""
         }
-        const styleTagSuperAndName = [superData.superClass, this.name].join(' ')
-        const styleTagSuperDirectName = [superData.superClass, '>' + this.name].join(' ')
+        const styleTagSuperAndName = [superData.superClass, view.name].join(' ')
+        const styleTagSuperDirectName = [superData.superClass, '>' + view.name].join(' ')
         
         view.styleTags = [
-            this.name,
+            view.name,
             styleTagSuperClass,
             styleTagSuperDirectName,
             styleTagSuperAndName
