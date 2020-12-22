@@ -207,7 +207,7 @@ export class View {
     }
 
     eval(context:any, showContext:Boolean = true) {
-        if (showContext)
+        if (showContext && false)
             console.info('View eval context:', context)
         this.params.forEach((value, key) => {
             value = this.innerEval(value, context)

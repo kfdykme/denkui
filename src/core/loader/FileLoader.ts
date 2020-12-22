@@ -6,10 +6,11 @@ import TagParser from '@/parser/TagParser.ts'
 import { View } from '@/data/View.ts'
 import LoaderManager from '@/core/loader/LoaderManager.ts'
 import LoadTagResult from '@/data/LoadTagResult.ts'
+import Project from '@/project/Project.ts'
 
 const CODE_PATH = 'src/'
 const MIDDLE_JS_OUTPUT_PATH = './intermediate/js/' + CODE_PATH
-const SOURCE_ROOT_PATH = '../bbs-quick/' + CODE_PATH
+
 
 
  
@@ -19,8 +20,16 @@ export class FileLoader {
     constructor() { 
         this.encoder = new TextEncoder();
         this.decoder = new TextDecoder('utf-8');
+        this.init()
     }
 
+    async init() {
+        let p = await Project.get()
+        FileLoader.SOURCE_ROOT_PATH = p.targetSourcePath + CODE_PATH
+    }
+
+
+    static SOURCE_ROOT_PATH = '../demo/' + CODE_PATH
     static getInstance() {
         return LoaderManager.get().fileLoader
     }
@@ -31,9 +40,10 @@ export class FileLoader {
      * @return 返回 route 等信息
      */
     loadRoute(route: string) {
+        if (route.startsWith('/')) route = route.replace(/\//,'')
         logger.info('FileLoader loadRoute', route)
         //1 到Manifest去找route的相关内容
-        let manifestLoader = new ManifestLoader(SOURCE_ROOT_PATH)
+        let manifestLoader = new ManifestLoader(FileLoader.SOURCE_ROOT_PATH)
         let o = manifestLoader.get()
         let routerPage = o.router.pages[route]?.component
         
@@ -64,7 +74,7 @@ export class FileLoader {
     }
 
     private loadTag(tagName:string, path:string): LoadTagResult {
-        const realPath = SOURCE_ROOT_PATH + path
+        const realPath = FileLoader.SOURCE_ROOT_PATH + path
         const tag = readTag(tagName, realPath)
         logger.info('FileLoader load ', tagName, tag,realPath)
         let content = ''
@@ -102,13 +112,13 @@ export class FileLoader {
     load(path:string, isRemoveRoot:boolean = false) {
         
         if (isRemoveRoot) {
-            path = path.substring(path.indexOf(SOURCE_ROOT_PATH) + SOURCE_ROOT_PATH.length)
+            path = path.substring(path.indexOf(FileLoader.SOURCE_ROOT_PATH) + FileLoader.SOURCE_ROOT_PATH.length)
         }
 
         logger.info('FileLoader load', path)
         
         //0 find target file from source dir
-        let loadPath = SOURCE_ROOT_PATH + path
+        let loadPath = FileLoader.SOURCE_ROOT_PATH + path
         logger.info('FileLoader load', 'try load file: ' + loadPath)
         //1 load file content
         let content = new TextDecoder('utf-8').decode(Deno.readFileSync(loadPath))
@@ -199,7 +209,7 @@ export class FileLoader {
                     // do nothing
                 } else if (regTarget.includes('/')){
                     if (level > 1) {
-                        content = this.loadOtherModule(imp, regTarget, path.replace(SOURCE_ROOT_PATH,''),content, level)
+                        content = this.loadOtherModule(imp, regTarget, path.replace(FileLoader.SOURCE_ROOT_PATH,''),content, level)
                     } else {
                         content = this.loadOtherModule(imp, regTarget, path,content, level)
                     }
@@ -280,7 +290,7 @@ export class FileLoader {
         // 1.1 make sure target file parent dir is exist
         this.makeSureDir(info.targetFileDirPath) 
         // logger.info()
-        let targetFileRealPath = SOURCE_ROOT_PATH + info.currentFileDirPath +  info.targetFilePath
+        let targetFileRealPath = FileLoader.SOURCE_ROOT_PATH + info.currentFileDirPath +  info.targetFilePath
         
         if (!targetFileRealPath.endsWith('.js') ) {
             targetFileRealPath += '.js'

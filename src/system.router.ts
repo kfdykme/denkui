@@ -59,7 +59,7 @@ const addPageIntoStack = async (page:any, mode:Mode = Mode.PUSH) => {
  
     await attach(page, mode)
 
-    app.currentPage.onInit()
+    app.currentPage.onInit && app.currentPage.onInit()
 
     // 处理组件
     try {
