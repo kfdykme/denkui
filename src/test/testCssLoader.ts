@@ -1,4 +1,4 @@
 import LoaderManager from '@/core/loader/LoaderManager.ts'
 
 
-LoaderManager.get().appLoader.load('app.ux')
+LoaderManager.get().appLoader.entry('Start/Login').load('app.ux')

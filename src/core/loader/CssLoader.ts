@@ -26,6 +26,10 @@ class BaseStack {
     isEmpty() {
         return this.data.length == 0
     }
+
+    size() {
+        return this.data.length
+    }
 }
 
 export default class CssLoader {
@@ -61,6 +65,7 @@ export default class CssLoader {
                 }
                 cssItem = {
                     header: [preHeader,getHeaderFromLine(line)].join(' ').trim(),
+                    index: this.cssSize() + cssRes.length,
                     body:[]
                 }
                 cssStack.push(cssItem)
@@ -99,6 +104,6 @@ export default class CssLoader {
     }
 
     private cssSize() {
-        return this.globalCssMap.size
+        return this.globalCssMap.values.length
     }
 }  

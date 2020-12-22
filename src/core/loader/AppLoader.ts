@@ -13,6 +13,7 @@ export class AppLoader{
     manifest :any 
     currentPage: any
     app:any
+    _entry:string|undefined = undefined
     constructor() {
         this.rootPath = Deno.cwd()
         logger.info("AppLoader",this.rootPath )
@@ -21,13 +22,19 @@ export class AppLoader{
         router.init(this)
     }
 
+    public entry(entry:string) {
+        this._entry = entry
+        return this
+    }
+
     async load(appPath:string) {
         appPath = '../../../' +FileLoader.getInstance().load(appPath).path
         logger.info('AppLoader load', appPath)
         // logger.info('AppLoader load', this.rootPath)
         let appModule = await import(appPath)
         this.app = appModule.default
-        let entry = this.manifest.router.entry
+        let entry = this._entry || this.manifest.router.entry
+        logger.info('AppLoader load entry', entry)
         this.app.hookCreate = () => {
             this.app.onCreate()
             router.push({

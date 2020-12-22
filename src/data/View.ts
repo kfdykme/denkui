@@ -33,13 +33,15 @@ export class CssHelper {
     static class(view:View): string {
         try {
             if ( view?.jsonParams?.class != undefined) {
-                return '.' + view?.jsonParams?.class
+                return view?.jsonParams?.class.split(' ').map((singleClass:string) => '.' + singleClass).join(' ')
             } else {
                 return ""
             }
         } catch (err) {
             return ""
         }
+
+        
     }
  
     static LoadStyleByCssTag(tag:string):string {
@@ -49,18 +51,21 @@ export class CssHelper {
     static buildStyle(view:View, superData:any) {
          
         // FIXME 这部分的逻辑还不完善
-        const superClass = CssHelper.class(view)
+        const superClasses = CssHelper.class(view).split(' ')
         // console.info(superClass)
-        let styleTagSuperClass = [superData.superClass, superClass].join(' ')
-        if (superClass === "") {
-            styleTagSuperClass = ""
+        let styleTagSuperClass:string[] = superClasses.map((superClass:string) => {
+            return [superData.superClass, superClass].join(' ')
+        })
+        if (superClasses.length === 0) {
+            styleTagSuperClass = [""]
         }
         const styleTagSuperAndName = [superData.superClass, view.name].join(' ')
         const styleTagSuperDirectName = [superData.superClass, '>' + view.name].join(' ')
         
         view.styleTags = [
             view.name,
-            styleTagSuperClass,
+            ...superClasses,
+            ...styleTagSuperClass,
             styleTagSuperDirectName,
             styleTagSuperAndName
         ]
@@ -72,6 +77,9 @@ export class CssHelper {
             return CssHelper.LoadStyleByCssTag(text)
         })
         .filter(Filters.FilterNotUndefined)
+        .sort((styleA:any, styleB:any) => { 
+            return styleA.index - styleB.index
+        })
 
         return styleTagSuperClass
     }
