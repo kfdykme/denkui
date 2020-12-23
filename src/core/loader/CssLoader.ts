@@ -78,7 +78,7 @@ export default class CssLoader {
             } else {
                 // normal css body 
                 cssItem = cssStack.top()
-                cssItem.body.push(line)
+                cssItem?.body.push(line)
             }
         }
         const filterStringNotEmpty = (text:string) => {

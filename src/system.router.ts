@@ -93,6 +93,10 @@ const push = async (obj:any) => {
     return appPage
 }
 
+const updateApp = (obj:any) => {
+    app.app = obj
+}
+
 const init = (obj:AppLoader) => {
     app = obj
 }
@@ -100,5 +104,6 @@ const init = (obj:AppLoader) => {
 export default {
     replace,
     push,
-    init
+    init,
+    updateApp
 }
