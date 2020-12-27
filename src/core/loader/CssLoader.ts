@@ -64,7 +64,7 @@ export default class CssLoader {
                     preHeader = cssStack.top().header
                 }
                 cssItem = {
-                    header: [preHeader,getHeaderFromLine(line)].join(' ').trim(),
+                    header: [preHeader,getHeaderFromLine(line)].join(' ').trim().replace(/\> +/g,'>'),
                     index: this.cssSize() + cssRes.length,
                     body:[]
                 }

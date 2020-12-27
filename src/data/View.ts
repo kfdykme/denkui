@@ -64,12 +64,12 @@ export class CssHelper {
                 return sup !== '.' 
             } )
         superData.superClass = superData.superClass == undefined ? [] : superData.superClass  
-        let styleTagSuperClass:string[] = []
+        let superClasses:string[] = []
         if (typeof superData.superClass === 'string') {
             superData.superClass = [superData.superClass ]
         }
         classes.forEach((superClass:string) => {
-            styleTagSuperClass = styleTagSuperClass.concat(superData.superClass
+            superClasses = superClasses.concat(superData.superClass
                 .filter((sup:string) => {
                     return sup !== '.' 
                 } )
@@ -78,15 +78,23 @@ export class CssHelper {
             }))
         })
         if (classes.length === 0) {
-            styleTagSuperClass = [""]
+            superClasses = superData.superClass
         }
+
+        if (superClasses.length == 0) {
+            superClasses = classes
+        }
+
         const styleTagSuperAndName = [superData.superClass, view.name].join(CLASS_SPLIT)
         const styleTagSuperDirectName = [superData.superClass, '>' + view.name].join(CLASS_SPLIT)
         
         view.styleTags = [
             view.name,
+            // '----------',
             ...classes,
-            ...styleTagSuperClass,
+            // '----------',
+            ...superClasses,
+            // '----------',
             styleTagSuperDirectName,
             styleTagSuperAndName,
             JSON.stringify({
@@ -98,15 +106,15 @@ export class CssHelper {
         .map((text:string) => {
             return text.trim()
         })
-        // .map((text:string) => {
-        //     return CssHelper.LoadStyleByCssTag(text)
-        // })
-        // .filter(Filters.FilterNotUndefined)
-        // .sort((styleA:any, styleB:any) => { 
-        //     return styleA.index - styleB.index
-        // })
+        .map((text:string) => {
+            return CssHelper.LoadStyleByCssTag(text)
+        })
+        .filter(Filters.FilterNotUndefined)
+        .sort((styleA:any, styleB:any) => { 
+            return styleA.index - styleB.index
+        })
 
-        return styleTagSuperClass
+        return superClasses
     }
 }
 
@@ -172,14 +180,14 @@ export class View {
         res = this.content.match(contentReg)
         this.content = res ? res[1] : '' 
        
-        let styleTagSuperClass = CssHelper.buildStyle(this, superData)
+        let superClasses = CssHelper.buildStyle(this, superData)
         
          console.info('styleTags ', this.name, this.styleTags)
         this.childs.forEach((child:View) => {
             child.build({
                 superParams: this.params,
                 superName: this.name,
-                superClass: styleTagSuperClass    
+                superClass: superClasses    
             })
         })
     }
