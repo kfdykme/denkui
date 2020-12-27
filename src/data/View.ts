@@ -33,7 +33,9 @@ export class CssHelper {
     static class(view:View): string {
         try {
             if ( view?.jsonParams?.class != undefined) {
-                return view?.jsonParams?.class.split(' ').map((singleClass:string) => '.' + singleClass).join(' ')
+                return view?.jsonParams?.class.split(' ')
+                .filter(Filters.FilterNotEmptyText)
+                .map((singleClass:string) => '.' + singleClass).join(' ')
             } else {
                 return ""
             }
@@ -49,37 +51,60 @@ export class CssHelper {
     }
 
     static buildStyle(view:View, superData:any) {
+
+        const CLASS_SPLIT = ' '
          
         // FIXME 这部分的逻辑还不完善
-        const superClasses = CssHelper.class(view).split(' ')
-        // console.info(superClass)
-        let styleTagSuperClass:string[] = superClasses.map((superClass:string) => {
-            return [superData.superClass, superClass].join(' ')
+        const classes = CssHelper.class(view)
+            .replace(/\{\{.*?\}\}/, '')
+            .trim()
+            .split(CLASS_SPLIT)
+            .filter(Filters.FilterNotEmptyText)
+            .filter((sup:string) => {
+                return sup !== '.' 
+            } )
+        superData.superClass = superData.superClass == undefined ? [] : superData.superClass  
+        let styleTagSuperClass:string[] = []
+        if (typeof superData.superClass === 'string') {
+            superData.superClass = [superData.superClass ]
+        }
+        classes.forEach((superClass:string) => {
+            styleTagSuperClass = styleTagSuperClass.concat(superData.superClass
+                .filter((sup:string) => {
+                    return sup !== '.' 
+                } )
+                .map((sup: string) => {
+                return [sup.trim(), superClass].join(CLASS_SPLIT)
+            }))
         })
-        if (superClasses.length === 0) {
+        if (classes.length === 0) {
             styleTagSuperClass = [""]
         }
-        const styleTagSuperAndName = [superData.superClass, view.name].join(' ')
-        const styleTagSuperDirectName = [superData.superClass, '>' + view.name].join(' ')
+        const styleTagSuperAndName = [superData.superClass, view.name].join(CLASS_SPLIT)
+        const styleTagSuperDirectName = [superData.superClass, '>' + view.name].join(CLASS_SPLIT)
         
         view.styleTags = [
             view.name,
-            ...superClasses,
+            ...classes,
             ...styleTagSuperClass,
             styleTagSuperDirectName,
-            styleTagSuperAndName
+            styleTagSuperAndName,
+            JSON.stringify({
+                parent: superData.superClass,
+                current: classes
+            }, null, 2)
         ]
         .filter(Filters.FilterNotEmptyText)
         .map((text:string) => {
             return text.trim()
         })
-        .map((text:string) => {
-            return CssHelper.LoadStyleByCssTag(text)
-        })
-        .filter(Filters.FilterNotUndefined)
-        .sort((styleA:any, styleB:any) => { 
-            return styleA.index - styleB.index
-        })
+        // .map((text:string) => {
+        //     return CssHelper.LoadStyleByCssTag(text)
+        // })
+        // .filter(Filters.FilterNotUndefined)
+        // .sort((styleA:any, styleB:any) => { 
+        //     return styleA.index - styleB.index
+        // })
 
         return styleTagSuperClass
     }
@@ -149,7 +174,7 @@ export class View {
        
         let styleTagSuperClass = CssHelper.buildStyle(this, superData)
         
-        console.info('styleTags', this.styleTags)
+         console.info('styleTags ', this.name, this.styleTags)
         this.childs.forEach((child:View) => {
             child.build({
                 superParams: this.params,
@@ -207,7 +232,7 @@ export class View {
     }
 
     eval(context:any, showContext:Boolean = true) {
-        if (showContext && false)
+        if (showContext )
             console.info('View eval context:', context)
         this.params.forEach((value, key) => {
             value = this.innerEval(value, context)
