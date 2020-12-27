@@ -5,7 +5,7 @@
 ### START
 
 ```bash
- deno run -A --import-map=import_map.json --unstable .\src\start\run.ts
+ deno run -A --import-map=import_map.json --unstable ./src/start/run.ts
 ```
 
 ### 介绍
