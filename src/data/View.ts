@@ -33,7 +33,9 @@ export class CssHelper {
     static class(view:View): string {
         try {
             if ( view?.jsonParams?.class != undefined) {
-                return view?.jsonParams?.class.split(' ').map((singleClass:string) => '.' + singleClass).join(' ')
+                return view?.jsonParams?.class.split(' ')
+                .filter(Filters.FilterNotEmptyText)
+                .map((singleClass:string) => '.' + singleClass).join(' ')
             } else {
                 return ""
             }
@@ -49,25 +51,56 @@ export class CssHelper {
     }
 
     static buildStyle(view:View, superData:any) {
+
+        const CLASS_SPLIT = ' '
          
         // FIXME 这部分的逻辑还不完善
-        const superClasses = CssHelper.class(view).split(' ')
-        // console.info(superClass)
-        let styleTagSuperClass:string[] = superClasses.map((superClass:string) => {
-            return [superData.superClass, superClass].join(' ')
-        })
-        if (superClasses.length === 0) {
-            styleTagSuperClass = [""]
+        const classes = CssHelper.class(view)
+            .replace(/\{\{.*?\}\}/, '')
+            .trim()
+            .split(CLASS_SPLIT)
+            .filter(Filters.FilterNotEmptyText)
+            .filter((sup:string) => {
+                return sup !== '.' 
+            } )
+        superData.superClass = superData.superClass == undefined ? [] : superData.superClass  
+        let superClasses:string[] = []
+        if (typeof superData.superClass === 'string') {
+            superData.superClass = [superData.superClass ]
         }
-        const styleTagSuperAndName = [superData.superClass, view.name].join(' ')
-        const styleTagSuperDirectName = [superData.superClass, '>' + view.name].join(' ')
+        classes.forEach((superClass:string) => {
+            superClasses = superClasses.concat(superData.superClass
+                .filter((sup:string) => {
+                    return sup !== '.' 
+                } )
+                .map((sup: string) => {
+                return [sup.trim(), superClass].join(CLASS_SPLIT)
+            }))
+        })
+        if (classes.length === 0) {
+            superClasses = superData.superClass
+        }
+
+        if (superClasses.length == 0) {
+            superClasses = classes
+        }
+
+        const styleTagSuperAndName = [superData.superClass, view.name].join(CLASS_SPLIT)
+        const styleTagSuperDirectName = [superData.superClass, '>' + view.name].join(CLASS_SPLIT)
         
         view.styleTags = [
             view.name,
+            // '----------',
+            ...classes,
+            // '----------',
             ...superClasses,
-            ...styleTagSuperClass,
+            // '----------',
             styleTagSuperDirectName,
-            styleTagSuperAndName
+            styleTagSuperAndName,
+            JSON.stringify({
+                parent: superData.superClass,
+                current: classes
+            }, null, 2)
         ]
         .filter(Filters.FilterNotEmptyText)
         .map((text:string) => {
@@ -81,7 +114,7 @@ export class CssHelper {
             return styleA.index - styleB.index
         })
 
-        return styleTagSuperClass
+        return superClasses
     }
 }
 
@@ -150,14 +183,14 @@ export class View {
         res = this.renderContent.match(contentReg)
         this.renderContent = res ? res[1] : '' 
        
-        let styleTagSuperClass = CssHelper.buildStyle(this, superData)
+        let superClasses = CssHelper.buildStyle(this, superData)
         
         // console.info('styleTags', this.styleTags)
         this.childs.forEach((child:View) => {
             child.build({
                 superParams: this.params,
                 superName: this.name,
-                superClass: styleTagSuperClass    
+                superClass: superClasses    
             })
         })
 
@@ -216,7 +249,7 @@ export class View {
     }
 
     eval(context:any, showContext:Boolean = true) {
-        if (showContext)
+        if (showContext )
             console.info('View eval context:', context)
         if (this.content !== undefined) {
             console.info('View innerEval content ', this.name, this.content)

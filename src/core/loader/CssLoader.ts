@@ -64,7 +64,7 @@ export default class CssLoader {
                     preHeader = cssStack.top().header
                 }
                 cssItem = {
-                    header: [preHeader,getHeaderFromLine(line)].join(' ').trim(),
+                    header: [preHeader,getHeaderFromLine(line)].join(' ').trim().replace(/\> +/g,'>'),
                     index: this.cssSize() + cssRes.length,
                     body:[]
                 }
@@ -78,7 +78,7 @@ export default class CssLoader {
             } else {
                 // normal css body 
                 cssItem = cssStack.top()
-                cssItem.body.push(line)
+                cssItem?.body.push(line)
             }
         }
         const filterStringNotEmpty = (text:string) => {

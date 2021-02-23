@@ -21,5 +21,5 @@ testFilePath.map(i => {
     v.deleteNull()
     return v
 }).forEach(v => {
-    console.info(v.format())
+    console.info('testTagParser', v.format())
 })

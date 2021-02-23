@@ -53,6 +53,8 @@ export class AppLoader{
                 
             }
         }
+
+        router.updateApp(this.app)
         logger.info('AppLoader', this.app)
         this.app.hookCreate()
     }

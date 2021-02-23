@@ -58,7 +58,7 @@ export default class TagParser {
             }
         }).map((o:any) => {
             let module:View = this.path(o.src)
-            console.info(module.toString())
+            // console.info(module.toString())
             module.name = o.name
             module.src = o.src
             return module
