@@ -139,7 +139,7 @@ export default class LifeCycleController {
 
         let appLoader = new AppLoader();
 
-        appLoader.load('app.ux')
+        appLoader.loadApp('app.ux')
     }
 
     async attachView(appPage:any, mode:Mode = Mode.PUSH) {

@@ -231,7 +231,7 @@ export class View {
                 "})" 
                 
                 const res2 = eval(str).call(context)
-                console.info('View eval ', str, ' result', res2)
+                //console.info('View eval ', str, ' result', res2)
                 return res2
             } catch(err) {
                 console.error(err)
@@ -239,9 +239,11 @@ export class View {
             }
           
         }
-        console.info('View innerEval ', str, res)
+        //console.info('View innerEval ', str, res)
         res?.forEach((i:string) => {
-            str = str.replace(i, tryEval(i))
+            let tryEvalRes = tryEval(i)
+            //console.info('View innerEval replace ', str, ' from ', i, ' into ', tryEvalRes)
+            str = str.replace(i, tryEvalRes)
         })
         
         return str
@@ -250,20 +252,22 @@ export class View {
 
     eval(context:any, showContext:Boolean = true) {
         if (showContext )
-            console.info('View eval context:', context)
+            //console.info('View eval context:', context)
         if (this.content !== undefined) {
-            console.info('View innerEval content ', this.name, this.content)
             this.renderContent = this.innerEval(this.content, context)
+            
+            //console.info('View innerEval content ', this.name, this.content, ' ==> ', this)
         }
         this.params.forEach((value, key) => {
-            console.info('View innerEval ', key, value)
+            //console.info('View innerEval ', key, value)
             value = this.innerEval(value, context)
             this.jsonParams[key] = value
             // console.info("View eval ", key,value)
         }) 
         this.childs.forEach(child => {
             child.eval(context, false)
-        })
+            //console.info(this.toString())
+        }) 
     }
 
     
@@ -280,9 +284,10 @@ export class View {
 
     replace(key:string, value:any) {
         if (this.content) {
-            if (this.content.indexOf(key) != -1)
-                console.info(`View replace {{${key}}} into ${value} at ${this.content.indexOf(key)} \n`)
-            this.renderContent = this.content.replace(`{{${key}}}`, value)
+            if (this.content.indexOf(key) != -1) {
+                //console.info(`View replace {{${key}}} into ${value} at ${this.content.indexOf(key)} \n`)
+                this.renderContent = this.content.replace(`{{${key}}}`, value)
+            }
         }
         if (this.jsonParams) {
             this.jsonParams = JSON.parse(JSON.stringify(this.jsonParams).replace(`{{${key}}}`, value))
