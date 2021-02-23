@@ -1,0 +1,11 @@
+{
+  "name": "denkui",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/kfdykme/denkui.git",
+  "author": "kfdykme <wim.k.f@live.com>",
+  "license": "MIT",
+  "dependencies": {
+    "less": "^3.13.0"
+  }
+}

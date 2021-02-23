@@ -2,7 +2,7 @@
 let _project:any|undefined = undefined
 const PROJECT_CONFIG_PATH = './project_config.json'
 const DEFAULT_PROJECT = {
-    targetSourcePath:"../bbs-quick/"
+    targetSourcePath:"../kfdo/"
 }
 
 const get = async () => {
@@ -11,8 +11,7 @@ const get = async () => {
         console.info('Project get', path)
         try {
             
-            const content = Deno.readTextFileSync(path)
-            _project = JSON.parse(content)
+            _project = DEFAULT_PROJECT
         } catch (err) {
             _project = DEFAULT_PROJECT
             Deno.writeTextFileSync(path, JSON.stringify(_project, null, 2))

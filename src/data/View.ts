@@ -92,7 +92,10 @@ export class CssHelper {
 export class View {
 
     name:string 
+    // 保存原始数据
     content?:string = ''
+    // 保存替换后的数据
+    renderContent?:string = ''
     childs:View[]
     params:Map<string,string> 
     jsonParams:any = {}
@@ -126,13 +129,13 @@ export class View {
         let res:any = nameReg.exec(this.name)
         let template = this.name
         this.name = res ? res[1] : ''
-        this.content = template.substring(this.name.length+1).trim()
+        this.renderContent = template.substring(this.name.length+1).trim()
 
         // 如果是单行的view
         let paramReg = /([a-z]|-|@|)+=\"(.| )*?\"/g
         let contentReg = /\>(.*)?\<\// 
          
-        this.content.match(paramReg)?.forEach((keyValue:string) => {
+        this.renderContent.match(paramReg)?.forEach((keyValue:string) => {
             let spIndex:number = keyValue.indexOf('=')
             let key = keyValue.substring(0, spIndex)
             let value = keyValue.substring(spIndex+1) 
@@ -144,12 +147,12 @@ export class View {
         }) 
         
         // console.info( this.content,this.content.match(contentReg))
-        res = this.content.match(contentReg)
-        this.content = res ? res[1] : '' 
+        res = this.renderContent.match(contentReg)
+        this.renderContent = res ? res[1] : '' 
        
         let styleTagSuperClass = CssHelper.buildStyle(this, superData)
         
-        console.info('styleTags', this.styleTags)
+        // console.info('styleTags', this.styleTags)
         this.childs.forEach((child:View) => {
             child.build({
                 superParams: this.params,
@@ -157,11 +160,14 @@ export class View {
                 superClass: styleTagSuperClass    
             })
         })
+
+        // 一开始的时候,这两者是相同的
+        this.content = this.renderContent
     }
  
 
     deleteNull() {
-        if (this.content == "") delete(this.content)
+        if (this.renderContent == "") delete(this.renderContent)
         // if (this.jsonParams.values.length == 0) {
         //     delete(this.params)
         //     delete(this.jsonParams)
@@ -191,13 +197,16 @@ export class View {
                 }).join(' ') + 
                 "})" 
                 
-                return eval(str).call(context)
+                const res2 = eval(str).call(context)
+                console.info('View eval ', str, ' result', res2)
+                return res2
             } catch(err) {
                 console.error(err)
                 return str
             }
           
         }
+        console.info('View innerEval ', str, res)
         res?.forEach((i:string) => {
             str = str.replace(i, tryEval(i))
         })
@@ -207,9 +216,14 @@ export class View {
     }
 
     eval(context:any, showContext:Boolean = true) {
-        if (showContext && false)
+        if (showContext)
             console.info('View eval context:', context)
+        if (this.content !== undefined) {
+            console.info('View innerEval content ', this.name, this.content)
+            this.renderContent = this.innerEval(this.content, context)
+        }
         this.params.forEach((value, key) => {
+            console.info('View innerEval ', key, value)
             value = this.innerEval(value, context)
             this.jsonParams[key] = value
             // console.info("View eval ", key,value)
@@ -235,7 +249,7 @@ export class View {
         if (this.content) {
             if (this.content.indexOf(key) != -1)
                 console.info(`View replace {{${key}}} into ${value} at ${this.content.indexOf(key)} \n`)
-            this.content = this.content.replace(`{{${key}}}`, value)
+            this.renderContent = this.content.replace(`{{${key}}}`, value)
         }
         if (this.jsonParams) {
             this.jsonParams = JSON.parse(JSON.stringify(this.jsonParams).replace(`{{${key}}}`, value))

@@ -96,6 +96,7 @@ export class DataBinder {
 
     bind(page:UxData, app:Application) {
         //bind data 
+        logger.info('DataBinder bind')
         this._innerBind(page, app, 'protected')
         this._innerBind(page, app, 'public')
 

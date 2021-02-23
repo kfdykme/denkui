@@ -28,10 +28,11 @@ export default class LifeCycleController {
         this.ipc = null
         let updateView = (key :string,value: any) => {
             this.currentPage?.replace(key, value)
-            logger.info("LifeCycleController UPDATE_VIEW_RENDER_VIEW ->", this.currentPage)
+            const renderViewData = LifeCycleController.currentPage()?.renderView()
+            logger.info("LifeCycleController UPDATE_VIEW_RENDER_VIEW ->",renderViewData)
             this.ipc?.send(JSON.stringify({
                 method:'RENDER_VIEW',
-                data:LifeCycleController.currentPage()?.renderView()
+                data:renderViewData
             }))
             // this.ipc?.send(JSON.stringify({
             //     method: "UPDATE_VIEW",
@@ -78,8 +79,13 @@ export default class LifeCycleController {
             try {
                 value = JSON.parse(event['param'])
             } catch (error) {
-                console.error(error)
+                // console.error(error)
+                if (value[0] == '\'')
+                    value = value.replace(/'(.*)'/,'$1')
+                else if (value[0] == '\"')
+                    value = value.replace(/"(.*)"/,'$1')
             }
+            console.info('HADNLE value', value)
             
             this.invoke(event['function'], value)
         }

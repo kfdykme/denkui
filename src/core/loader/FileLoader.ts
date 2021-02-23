@@ -29,7 +29,7 @@ export class FileLoader {
     }
 
 
-    static SOURCE_ROOT_PATH = '../demo/' + CODE_PATH
+    static SOURCE_ROOT_PATH = '../kfdo/' + CODE_PATH
     static getInstance() {
         return LoaderManager.get().fileLoader
     }

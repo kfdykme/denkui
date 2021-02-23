@@ -8,6 +8,6 @@ export default class Logger {
     }
 
     dev(...vars: any[]) { 
-        _console.log(new Date(), ...[this.name, ...vars])
+        // _console.log(new Date(), ...[this.name, ...vars])
     }
 }
