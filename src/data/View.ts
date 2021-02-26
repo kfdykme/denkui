@@ -41,80 +41,91 @@ export class CssHelper {
             }
         } catch (err) {
             return ""
-        }
-
-        
+        }        
     }
  
     static LoadStyleByCssTag(tag:string):string {
         return LoaderManager.get().cssLoader.getCss(tag)
     }
 
-    static buildStyle(view:View, superData:any) {
-
-        const CLASS_SPLIT = ' '
-         
-        // FIXME 这部分的逻辑还不完善
-        const classes = CssHelper.class(view)
-            .replace(/\{\{.*?\}\}/, '')
-            .trim()
-            .split(CLASS_SPLIT)
-            .filter(Filters.FilterNotEmptyText)
-            .filter((sup:string) => {
-                return sup !== '.' 
-            } )
-        superData.superClass = superData.superClass == undefined ? [] : superData.superClass  
-        let superClasses:string[] = []
-        if (typeof superData.superClass === 'string') {
-            superData.superClass = [superData.superClass ]
-        }
-        classes.forEach((superClass:string) => {
-            superClasses = superClasses.concat(superData.superClass
-                .filter((sup:string) => {
-                    return sup !== '.' 
-                } )
-                .map((sup: string) => {
-                return [sup.trim(), superClass].join(CLASS_SPLIT)
-            }))
-        })
-        if (classes.length === 0) {
-            superClasses = superData.superClass
-        }
-
-        if (superClasses.length == 0) {
-            superClasses = classes
-        }
-
-        const styleTagSuperAndName = [superData.superClass, view.name].join(CLASS_SPLIT)
-        const styleTagSuperDirectName = [superData.superClass, '>' + view.name].join(CLASS_SPLIT)
+    // static buildStyle(view:View, superData:any) {
         
-        view.styleTags = [
-            view.name,
-            // '----------',
-            ...classes,
-            // '----------',
-            ...superClasses,
-            // '----------',
-            styleTagSuperDirectName,
-            styleTagSuperAndName,
-            JSON.stringify({
-                parent: superData.superClass,
-                current: classes
-            }, null, 2)
-        ]
-        .filter(Filters.FilterNotEmptyText)
-        .map((text:string) => {
-            return text.trim()
-        })
-        .map((text:string) => {
-            return CssHelper.LoadStyleByCssTag(text)
-        })
-        .filter(Filters.FilterNotUndefined)
-        .sort((styleA:any, styleB:any) => { 
-            return styleA.index - styleB.index
-        })
+        
 
-        return superClasses
+    //     const CLASS_SPLIT = ' '
+         
+    //     // FIXME 这部分的逻辑还不完善
+    //     const classes = CssHelper.class(view)
+    //         .replace(/\{\{.*?\}\}/, '')
+    //         .trim()
+    //         .split(CLASS_SPLIT)
+    //         .filter(Filters.FilterNotEmptyText)
+    //         .filter((sup:string) => {
+    //             return sup !== '.' 
+    //         } )
+    //     superData.superClass = superData.superClass == undefined ? [] : superData.superClass  
+    //     let superClasses:string[] = []
+    //     if (typeof superData.superClass === 'string') {
+    //         superData.superClass = [superData.superClass ]
+    //     }
+    //     classes.forEach((superClass:string) => {
+    //         superClasses = superClasses.concat(superData.superClass
+    //             .filter((sup:string) => {
+    //                 return sup !== '.' 
+    //             } )
+    //             .map((sup: string) => {
+    //             return [sup.trim(), superClass].join(CLASS_SPLIT)
+    //         }))
+    //     })
+    //     if (classes.length === 0) {
+    //         superClasses = superData.superClass
+    //     }
+
+    //     if (superClasses.length == 0) {
+    //         superClasses = classes
+    //     }
+
+    //     const styleTagSuperAndName = [superData.superClass, view.name].join(CLASS_SPLIT)
+    //     const styleTagSuperDirectName = [superData.superClass, '>' + view.name].join(CLASS_SPLIT)
+        
+    //     view.styleTags = [
+    //         view.name,
+    //         // '----------',
+    //         ...classes,
+    //         // '----------',
+    //         ...superClasses,
+    //         // '----------',
+    //         styleTagSuperDirectName,
+    //         styleTagSuperAndName,
+    //         JSON.stringify({
+    //             parent: superData.superClass,
+    //             current: classes
+    //         }, null, 2)
+    //     ]
+    //     .filter(Filters.FilterNotEmptyText)
+    //     .map((text:string) => {
+    //         return text.trim()
+    //     })
+    //     .map((text:string) => {
+    //         return CssHelper.LoadStyleByCssTag(text)
+    //     })
+    //     .filter(Filters.FilterNotUndefined)
+    //     .sort((styleA:any, styleB:any) => { 
+    //         return styleA.index - styleB.index
+    //     })
+
+    //     return superClasses
+    // }
+
+    static mapCss(view: View) {
+        view.styleTags = view.styleTags
+            .map((text:string) => {
+                return CssHelper.LoadStyleByCssTag(text)
+            })
+            .filter(Filters.FilterNotUndefined)
+            .sort((styleA:any, styleB:any) => { 
+                return styleA.index - styleB.index
+            })
     }
 }
 
@@ -138,6 +149,12 @@ export class View {
 
     // 保存一下组件的src路径
     src:string = ""
+
+
+    hasBuildViewName = false
+    hasLoadCss = false
+
+
     constructor(name:string) {
         this.name = name
         this.childs = []
@@ -154,43 +171,52 @@ export class View {
     }
 
 
+    buildNameAndContent() {
+        if (!this.hasBuildViewName) {
+            this.hasBuildViewName = true
+
+            let nameReg = /\<(([a-z]|-)+)?( |\n|\>)/
+            let res:any = nameReg.exec(this.name)
+            let template = this.name
+            this.name = res ? res[1] : ''
+            this.renderContent = template.substring(this.name.length+1).trim()            
+
+            // 如果是单行的view
+            let paramReg = /([a-z]|-|@|)+=\"(.| )*?\"/g
+            let contentReg = /\>(.*)?\<\// 
+            
+            this.renderContent?.match(paramReg)?.forEach((keyValue:string) => {
+                let spIndex:number = keyValue.indexOf('=')
+                let key = keyValue.substring(0, spIndex)
+                let value = keyValue.substring(spIndex+1) 
+                this.params.set(key, value.replace(/\"/g,''))
+            })
+            
+            this.params.forEach((value, key) => {
+                this.jsonParams[key] = value
+            }) 
+            
+            // console.info( this.content,this.content.match(contentReg))
+            res = this.renderContent.match(contentReg)
+            this.renderContent = res ? res[1] : '' 
+        }
+    }
+
+
     /**
      * 处理name , param 等内容
      */
     build(superData:any = {}) {
-        let nameReg = /\<(([a-z]|-)+)?( |\n|\>)/
-        let res:any = nameReg.exec(this.name)
-        let template = this.name
-        this.name = res ? res[1] : ''
-        this.renderContent = template.substring(this.name.length+1).trim()
-
-        // 如果是单行的view
-        let paramReg = /([a-z]|-|@|)+=\"(.| )*?\"/g
-        let contentReg = /\>(.*)?\<\// 
-         
-        this.renderContent.match(paramReg)?.forEach((keyValue:string) => {
-            let spIndex:number = keyValue.indexOf('=')
-            let key = keyValue.substring(0, spIndex)
-            let value = keyValue.substring(spIndex+1) 
-            this.params.set(key, value.replace(/\"/g,''))
-        })
-        
-        this.params.forEach((value, key) => {
-            this.jsonParams[key] = value
-        }) 
-        
-        // console.info( this.content,this.content.match(contentReg))
-        res = this.renderContent.match(contentReg)
-        this.renderContent = res ? res[1] : '' 
+        this.buildNameAndContent()
        
-        let superClasses = CssHelper.buildStyle(this, superData)
-        
+        // let superClasses = CssHelper.buildStyle(this, superData)
+        LoaderManager.get().cssLoader.buildCssTagsFromView(this)
         // console.info('styleTags', this.styleTags)
         this.childs.forEach((child:View) => {
             child.build({
                 superParams: this.params,
                 superName: this.name,
-                superClass: superClasses    
+                superClass: 'superClasses'    
             })
         })
 

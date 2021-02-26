@@ -5,7 +5,7 @@ const filters:string[] = [
     // 'FileLoader load mport:',
     // 'FileLoader tag',
     'AppLoader',
-    // "DataBinder",
+    "DataBinder",
     'makeSureDir',
     'TAGREADER',
     "TagParser",

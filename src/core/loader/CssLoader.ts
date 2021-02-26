@@ -2,6 +2,9 @@ import LoaderManager from '@/core/loader/LoaderManager.ts'
 import LoadTagResult from '@/data/LoadTagResult.ts'
 import Logger from '@/log/logger.ts'
 
+// import  from '@/data/View.ts'
+import { View, CssHelper } from '@/data/View.ts'
+import Filters from '@/filter/Filters.ts'
 /**
  * CssLoader 传入CSS的文本， 给出结构
  */
@@ -41,6 +44,8 @@ export default class CssLoader {
     static get() {
         return LoaderManager.get().cssLoader
     }
+
+    
 
     public loadTag(tag: LoadTagResult) {
         logger.dev('loadTag', tag)
@@ -101,6 +106,72 @@ export default class CssLoader {
 
     public getCss(tag:string) {
         return this.globalCssMap.get(tag)
+    }
+
+    public buildCssTagsFromView(view: View) {
+        let viewStack = this.changeViewTreeIntoViewStack(view)
+
+
+        viewStack.forEach((view:View) => {  
+            view.buildNameAndContent()
+        })
+        viewStack = viewStack.filter((v: View) => {
+            return v.name !== 'view' && v.name !== 'template'
+        }) 
+        viewStack.forEach((v: View) => {
+            if (v.hasLoadCss) {
+                return
+            }
+            v.hasLoadCss = true          
+            console.info('CssLoader buildCssTagsFromView ', v.name, v.styleTags) 
+            this.buildSingleCssNode(v)
+        })
+
+        viewStack.forEach((v: View) => {
+            CssHelper.mapCss(v)
+        })
+    }
+
+    private buildSingleCssNode(view: View, parentCss: string[] = []) {
+        view.styleTags.push(view.name)
+        const classes = CssHelper.class(view)
+        view.styleTags = view.styleTags.concat(classes)
+                            .filter(Filters.FilterNotEmptyText)
+        
+        let withParents: string[] = []
+        if (parentCss.length >= 1) {
+            parentCss.forEach((parent: string) => {
+                view.styleTags.forEach((css: string) => {
+                    withParents.push([parent, css].join(' '))
+                })
+            })
+    
+            view.styleTags = withParents
+        }
+  
+        console.info('CssLoader buildSingleCssNode \n name: ', view.name, '\n class: ', classes, '\n css: ', view.styleTags)
+        view.childs.forEach((child:View) => {
+            this.buildSingleCssNode(child, view.styleTags)
+        })
+    }
+
+    private changeViewTreeIntoViewStack(view: View) {
+        let viewStack = [view]
+        let viewCacheStack = [view]
+
+        view = viewCacheStack.pop()!!
+        while(view != null) {
+            view.childs.forEach((child: View) => {
+                viewCacheStack.push(child)
+                viewStack.push(child)
+            })
+            view = viewCacheStack.pop()!!
+        }
+        return viewStack
+    }
+
+    private innerBuildCss(view: View) {
+
     }
 
     private cssSize() {
