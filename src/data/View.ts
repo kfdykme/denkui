@@ -118,6 +118,10 @@ export class CssHelper {
     // }
 
     static mapCss(view: View) {
+        if (view.styleTags.length > 0 && typeof view.styleTags[0] !== 'string') {
+            console.info('CssHelper mapCss again', view.name, view.styleTags)
+            return
+        }
         view.styleTags = view.styleTags
             .map((text:string) => {
                 return CssHelper.LoadStyleByCssTag(text)
@@ -126,6 +130,8 @@ export class CssHelper {
             .sort((styleA:any, styleB:any) => { 
                 return styleA.index - styleB.index
             })
+
+        console.info('CssHelper mapCss', view.name, view.styleTags)
     }
 }
 
