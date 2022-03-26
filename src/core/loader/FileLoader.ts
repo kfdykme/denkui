@@ -26,6 +26,7 @@ export class FileLoader {
     async init() {
         let p = await Project.get()
         FileLoader.SOURCE_ROOT_PATH = p.targetSourcePath + CODE_PATH
+        logger.info('LifeCycleController init', p, FileLoader.SOURCE_ROOT_PATH)
     }
 
 

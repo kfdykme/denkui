@@ -35,6 +35,7 @@ export class AppLoader{
     }
 
     async loadApp(appPath:string) {
+        await FileLoader.getInstance().init()
         appPath = '../../../' +FileLoader.getInstance().load(appPath).path
         logger.info('AppLoader load', appPath)
         // logger.info('AppLoader load', this.rootPath)
