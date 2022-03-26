@@ -66,7 +66,9 @@ export class FileLoader {
         logger.info("FileLoader loadUx", path)
         //1 get script content or src attr 
         const tagScript = this.loadTag('script', path)
+        logger.info("FileLoader script res", tagScript)
         const tagStyle = this.loadTag('style', path)
+        logger.info("FileLoader style res", tagStyle)
         return {
             style: tagStyle,
             content: tagScript.content,
@@ -99,6 +101,7 @@ export class FileLoader {
             Deno.mkdirSync(MIDDLE_JS_OUTPUT_PATH +  FileLoader.getDirPathFromFilePath(path), { recursive: true})
             logger.info('FileLoader load into ', targetFilePath)
             Deno.writeFileSync(MIDDLE_JS_OUTPUT_PATH + targetFilePath, this.encoder.encode(content))
+            logger.info('FileLoader load into Finish', targetFilePath)
         }
 
         return new LoadTagResult(content, targetFilePath)
@@ -127,7 +130,7 @@ export class FileLoader {
         // if is js file
         let res:any 
         logger.info('FileLoader load', 'try write to ' + path)
-            if (path.includes('.js')) {
+        if (path.includes('.js')) {
             res = this.loadContent(content, path)
             
             Deno.mkdirSync(MIDDLE_JS_OUTPUT_PATH + FileLoader.getDirPathFromFilePath(path), { recursive: true})
@@ -146,7 +149,9 @@ export class FileLoader {
                 this.encoder.encode(content))
 
         // 2 load ux file
+            logger.info('FileLoader load loadUx')
             res = this.loadUx(path)
+            logger.info('FileLoader load loadUx res', res)
             let style = res.style
             style = LoaderManager.get().cssLoader.loadTag(style)
         //parser tempalte 

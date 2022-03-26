@@ -7,15 +7,23 @@
 
 import TagData from '@/data/TagData.ts'
 import logger from '@/log/console.ts'
+import OS from '@/common/os.ts'
 
 let readTag = (tag:string, path:string,content:string = ''):TagData => {
     logger.info('TAGREADER readTag', tag, path, content)
     if (content === '') {
         let decoder = new TextDecoder('utf-8')
+        logger.info('TAGREADER readTag content readFileSync path', path)
         content = decoder.decode(Deno.readFileSync(path))
+        logger.info('TAGREADER readTag content', content)
     }
     let reg = new RegExp("\<" + tag + "(.*?)\>(.*(\r\n|\r|\n))?((.*(\r\n|\r|\n))*)\<\/" + tag + "\>")
+    if (OS.isWindows()) {
+        reg = new RegExp("\<" + tag + "(.*?)\>(.*(\r\n))?((.*(\r\n))*)\<\/" + tag + "\>")
+    }
+    logger.info('TAGREADER before exec content')
     let result = reg.exec(content)
+    logger.info('TAGREADER exec content result', result)
     let o:any = {
         params:{
 

@@ -16,6 +16,7 @@ export class UxLoader {
      * @param app 
      */
     async load(uri: string, app: any) {
+        logger.info('UxLoader load START', uri)
         let result = FileLoader.getInstance().loadRoute(uri)
         let p = '../../../' + result.path
         logger.info('UxLoader load ', result)

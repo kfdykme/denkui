@@ -1,13 +1,13 @@
 
 const filters:string[] = [
-    'FileLoader', 
+    // 'FileLoader', 
     // 'FileLoader load loadSystem',
     // 'FileLoader load mport:',
     // 'FileLoader tag',
     'AppLoader',
     "DataBinder",
     'makeSureDir',
-    'TAGREADER',
+    // 'TAGREADER',
     "TagParser",
     "ManifestLoader",
     "TagData",
@@ -15,7 +15,7 @@ const filters:string[] = [
     "FETCH",
     // 'HANDLE',
     // 'UxLoader',
-    'CssLoader',
+    // 'CssLoader',
     'SYSTEM.ROUTER',
     // "LifeCycleController",
 ]
