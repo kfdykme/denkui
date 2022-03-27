@@ -3,6 +3,7 @@ import {AppLoader} from '@/core/loader/AppLoader.ts';
 import {DataBinder,UxData} from '@/core/binder/DataBinder.ts'
 import logger from '@/log/console.ts'
 import {Mode} from '@/system.router.ts'
+import storage from '@/system.storage.ts'
 
 let sInstance:LifeCycleController|null = null
 
@@ -98,9 +99,12 @@ export default class LifeCycleController {
         }))
     }
 
-    start() {
+    async start() {
         logger.info("LifeCycleController start.")
-        this.ipc = new IpcController(8082)
+        let port:string = (await storage.get({
+            key: 'GLOBAL_PORT'
+        })) as string
+        this.ipc = new IpcController(Number.parseInt(port) || 8082)
         logger.info("LifeCycleController waiting flutter response.")
         
         this.ipc.addCallback((message:string) => { 

@@ -47,11 +47,11 @@ export default class TagParser {
             view =  this.readTag(templateContent)
         }
         
-        let importReg = /<import +name="(.*?)" +src="(.*?)"><\/import>/g
+        let importReg = /<import +name="(.*?)" +src="(.*?).ts"><\/import>/g
         let importViews =fileContent.match(importReg)
         
         view.components = importViews?.map((i:string) => {
-            let [content, name, src] = /<import +name="(.*?)" +src="(.*?)"/.exec(i)?? [i,i,i]
+            let [content, name, src] = /<import +name="(.*?)" +src="(.*?).ts"/.exec(i)?? [i,i,i]
             return {
                 name,
                 src: FileLoader.getDirPathFromFilePath(filePath) + src + '.ux'

@@ -1,13 +1,10 @@
 /*
  * @Author: kfdykme
  */
-/*
- * @Author: kfdykme
- */
 
 import TagData from '@/data/TagData.ts'
 import logger from '@/log/console.ts'
-import OS from '@/common/os.ts'
+import os from '@/common/common.os.ts'
 
 let readTag = (tag:string, path:string,content:string = ''):TagData => {
     logger.info('TAGREADER readTag', tag, path, content)
@@ -18,7 +15,7 @@ let readTag = (tag:string, path:string,content:string = ''):TagData => {
         logger.info('TAGREADER readTag content', content)
     }
     let reg = new RegExp("\<" + tag + "(.*?)\>(.*(\r\n|\r|\n))?((.*(\r\n|\r|\n))*)\<\/" + tag + "\>")
-    if (OS.isWindows()) {
+    if (os.isWindows()) {
         reg = new RegExp("\<" + tag + "(.*?)\>(.*(\r\n))?((.*(\r\n))*)\<\/" + tag + "\>")
     }
     logger.info('TAGREADER before exec content')

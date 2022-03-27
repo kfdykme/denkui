@@ -11,7 +11,7 @@ const filters:string[] = [
     "TagParser",
     "ManifestLoader",
     "TagData",
-    "IpcController",
+    // "IpcController",
     "FETCH",
     // 'HANDLE',
     // 'UxLoader',

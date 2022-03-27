@@ -60,9 +60,9 @@ export class UxLoader {
             .getInstance()
             .load(path, true)
 
-        // logger.info('UxLoader load import components', result)
+        // logger.info('UxLoader load import compone.ts', result)
         let p = '../../../' + result.path
-        logger.info('UxLoader loadPath import components', p)
+        logger.info('UxLoader loadPath import compone.ts', p)
         let module = await import(p)
         console.info('UxLoader loadPath', module)
         let comp = module.default

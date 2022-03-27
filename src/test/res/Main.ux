@@ -1,8 +1,8 @@
-<import name="post-list-view" src="../Comp/PostListView"></import>
-<import name="board-list-view" src="../Comp/BoardListView"></import>
-<import name="message-view" src="./Message/MessageView"></import>
-<import name="float-bar" src="../Comp/FloatBar"></import>
-<import name="user-view" src="./User/UserView"></import>
+<import name="post-list-view" src="../Comp/PostListView.ts"></import>
+<import name="board-list-view" src="../Comp/BoardListView.ts"></import>
+<import name="message-view" src="./Message/MessageView.ts"></import>
+<import name="float-bar" src="../Comp/FloatBar.ts"></import>
+<import name="user-view" src="./User/UserView.ts"></import>
 
 
 <template>

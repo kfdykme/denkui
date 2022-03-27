@@ -227,12 +227,12 @@ export class FileLoader {
         })
 
         
-        //import "./appStatistics.min.js"
+        //import "./appStatistics.min.js.ts"
         //2.0 some other example
-        const regImport2 = /import +('|")(.*)('|")/g
+        const regImport2 = /import +('|")(.*)('|.ts")/g
         improts = content.match(regImport2)
         improts?.forEach((imp:string) => {
-            const regItem2 = /import +('|")(.*)('|")/
+            const regItem2 = /import +('|")(.*)('|.ts")/
             logger.info("FileLoader load import:[" + imp + "]", path)
             let res = regItem2.exec(imp)
             if (res && res.length > 3) {
