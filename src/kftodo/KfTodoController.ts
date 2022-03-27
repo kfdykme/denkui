@@ -75,7 +75,14 @@ export default class KfTodoController {
     }
 
     handleInvoke(ipcData: AsyncIpcData) {
-        const { invokeName, invokeData: data } = ipcData.data
+        const { invokeName, data:invokeData } = ipcData.data
+        if (invokeName === 'readFile') {
+            const content = fs.readFileSync(invokeData)
+            ipcData.data = {
+                content
+            }
+            this.ipc?.response(ipcData)
+        }
     }
 
     onMessage(message: string) {
