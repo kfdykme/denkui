@@ -4,6 +4,7 @@ import logger from '@/log/console.ts'
 import fs from '@/common/common.fs.ts'
 import { AsyncIpcController } from "@/ipc/AsyncIpcController.ts"
 import { AsyncIpcData } from "@/ipc/AsyncIpcController.ts"
+import ReadBlog, { HeaderInfo} from "@/kftodo/ReadBlog.ts"
 
 interface IEventData {
     name: string
@@ -74,14 +75,75 @@ export default class KfTodoController {
         })
     }
 
-    handleInvoke(ipcData: AsyncIpcData) {
+    async handleInvoke(ipcData: AsyncIpcData) {
         const { invokeName, data:invokeData } = ipcData.data
         if (invokeName === 'readFile') {
             const content = fs.readFileSync(invokeData)
             ipcData.data = {
-                content
+                content,
+                path: invokeData
             }
             this.ipc?.response(ipcData)
+        }
+        if (invokeName === 'writeFile') {
+            const { content, path} = invokeData
+            fs.writeFileSync(path, content);
+            const listDataRes = await storage.get({ key: 'listData' })
+            const hitItems = listDataRes.data.headerInfos.filter((item :any) => {
+                return item.path == path
+            })
+            let item: any = {}
+            if (hitItems.length === 0) {
+                item = {
+                    "title": content.substring(0, 20),
+                    "date": new Date().toDateString(),
+                    "dateMs" : new Date().getTime(),
+                    "path": path,
+                    "tags": []
+                }
+                listDataRes.data.headerInfos.push(item)
+            } else {
+                item = listDataRes.data
+            }
+
+            try {
+                let info:HeaderInfo = ReadBlog.handleFile(content, path);
+                item.title = info.title
+                item.date = info.date
+                item.path = info.path
+                item.tags = info.tags
+            } catch (err) {
+                ipcData.data = {
+                    msg: 'error: ' + err
+                }
+                this.ipc?.response(ipcData)
+                return
+            }
+
+            await storage.set({ key: 'listData', value: listDataRes.data });
+            this.ipc?.response(ipcData)
+        }
+        if (invokeName === 'getNewBlogTemplate') {
+            const content = 
+`---
+title: UnNamed
+date: ${new Date().toLocaleString()}
+tags:
+---
+
+
+
+
+
+
+
+
+
+`
+            ipcData.data = {
+                content
+            }
+            this.ipc?.response(ipcData);
         }
     }
 
