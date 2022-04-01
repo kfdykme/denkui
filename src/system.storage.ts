@@ -51,7 +51,7 @@ let get = (o:IGetP):Promise<any> => {
         let res = {
             data:json[key]
         }
-        logger.info("SYSTEM.STORAGE get ", o, " result is :", res)
+        // logger.info("SYSTEM.STORAGE get ", o, " result is :", res)
         reslove(res)
     })
 }

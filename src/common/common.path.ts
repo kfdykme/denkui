@@ -9,6 +9,30 @@ const homePath = () => {
     }
 }
 
+class Dir {
+    constructor() {
+
+    }
+
+    static get Spelator() {
+        if (os.isWindows()) {
+            return '\\'
+        } else {
+            return '/'
+        }
+    }
+}
+    
+    
+
+const getDirPath = (filePath: string) => {
+    if (filePath === '') return filePath
+
+    return filePath.substring(0, filePath.lastIndexOf(Dir.Spelator))
+}
+
 export default {
-    homePath
+    homePath,
+    getDirPath,
+    Dir
 }

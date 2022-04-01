@@ -4,7 +4,8 @@ import logger from '@/log/console.ts'
 import fs from '@/common/common.fs.ts'
 import { AsyncIpcController } from "@/ipc/AsyncIpcController.ts"
 import { AsyncIpcData } from "@/ipc/AsyncIpcController.ts"
-import ReadBlog, { HeaderInfo} from "@/kftodo/ReadBlog.ts"
+import ReadBlog, { HeaderInfo } from "@/kftodo/ReadBlog.ts"
+import Path from '@/common/common.path.ts'
 
 interface IEventData {
     name: string
@@ -87,6 +88,7 @@ export default class KfTodoController {
         }
         if (invokeName === 'writeFile') {
             const { content, path} = invokeData
+            fs.mkdirSync(Path.getDirPath(path), { recursive: true})
             fs.writeFileSync(path, content);
             const listDataRes = await storage.get({ key: 'listData' })
             const hitItems = listDataRes.data.headerInfos.filter((item :any) => {
@@ -103,7 +105,7 @@ export default class KfTodoController {
                 }
                 listDataRes.data.headerInfos.push(item)
             } else {
-                item = listDataRes.data
+                item = hitItems[0]
             }
 
             try {
@@ -121,6 +123,21 @@ export default class KfTodoController {
             }
 
             await storage.set({ key: 'listData', value: listDataRes.data });
+            this.ipc?.response(ipcData)
+        }
+        if (invokeName === 'deleteItem') {
+            const { path } = invokeData
+            const listDataRes = await storage.get({ key: 'listData' })
+            const hitItems = listDataRes.data.headerInfos.filter((item :any) => {
+                if (item.path == path) {
+                    logger.info('KfTodoController deleteItem', path)
+
+                }
+                return item.path != path
+            })
+            listDataRes.data.headerInfos = hitItems
+            await storage.set({ key: 'listData', value: listDataRes.data });
+            
             this.ipc?.response(ipcData)
         }
         if (invokeName === 'getNewBlogTemplate') {
