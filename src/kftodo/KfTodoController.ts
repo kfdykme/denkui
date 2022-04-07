@@ -29,7 +29,7 @@ export default class KfTodoController {
             logger.error('KfTodoController', err)
         }
         logger.info('KfTodoController port ', res.data, iport)
-        this.ipc = new AsyncIpcController(iport)
+        this.ipc = new AsyncIpcController(iport || 8082)
 
         const onMessageHandler = (message: string) => {
             this.onMessage(message)
@@ -62,12 +62,14 @@ export default class KfTodoController {
         const listDataRes = await storage.get({ key: 'listData' })
         if (!listDataRes.data) {
 
-            const dataIndexConfigPath = 'C:\\Users\\wimkf\\Desktop\\wor\\blog\\result.json'
-            const content = fs.readFileSync(dataIndexConfigPath)
-            listDataRes.data = JSON.parse(content)
+            // const dataIndexConfigPath = 'C:\\Users\\wimkf\\Desktop\\wor\\blog\\result.json'
+            
+            // const content = fs.readFileSync(dataIndexConfigPath)
+            // listDataRes.data = JSON.parse(content)
 
-            // logger.info('KfTodoController', 'initData', dataIndexConfigPath, content)
-            await storage.set({ key: 'listData', value: listDataRes.data })
+            // // logger.info('KfTodoController', 'initData', dataIndexConfigPath, content)
+            // await storage.set({ key: 'listData', value: listDataRes.data })
+            listDataRes.data = []
         }
 
         this.send({
