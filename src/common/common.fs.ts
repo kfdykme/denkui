@@ -1,5 +1,6 @@
 
 import logger from '@/log/console.ts'
+import path from '@/common/common.path.ts'
 
 const decoder = new TextDecoder('utf-8') 
 const encoder = new TextEncoder()
@@ -15,8 +16,42 @@ const mkdirSync = (path:string, option: any) => {
     return Deno.mkdirSync(path, option)
 }
 
+interface IReadDirRes {
+    name:string
+    path: string
+    isFile: boolean,
+    isDirectory: boolean,
+    isSymlibk: boolean
+}
+
+const readDirSync = (filePath: string):IReadDirRes[] => {
+    let res:any[] = []
+    for( const item of Deno.readDirSync(filePath)) {
+        const dirItem = {
+            path: filePath + path.Dir.Spelator + item.name,
+            ...item
+        }
+        res.push(dirItem)
+    }
+    return res
+}
+
+const walkDirSync = (filePath: string):IReadDirRes[] => {
+    let res:any[] = []
+    for(const item of readDirSync(filePath)) {
+        if (item.isDirectory) {
+            res = res.concat(walkDirSync(item.path))
+        } else if (item.isFile || item.isSymlibk) {
+            res.push(item)
+        }
+    }
+    return res
+}
+
 export default {
     readFileSync,
     writeFileSync,
-    mkdirSync
+    mkdirSync,
+    readDirSync,
+    walkDirSync
 }

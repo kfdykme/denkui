@@ -164,6 +164,11 @@ tags:
             }
             this.ipc?.response(ipcData);
         }
+
+        if (invokeName === 'initData') {
+            const { path } = invokeData
+            
+        }
     }
 
     onMessage(message: string) {
@@ -177,7 +182,7 @@ tags:
 
             logger.info('KfTodoController onMessage event', event)
             if (event.name === 'onFirstConnect') {
-                this.initData()
+                // this.initData()
             }
 
             if (event.name === 'invoke') {
