@@ -18,8 +18,8 @@ const handleFile = (content: string, filePath: string):HeaderInfo => {
     // console.info()
     const header:any = headerInfoReg.exec(content)
     logger.info('header', header)
-    const headerText = header && header[0]
-
+    let headerText = header && header[0].replace(/tag:/, 'tags *:')
+    
     // get info from headerText
     const headerInfo: any = {}
     headerText?.split('\n').filter((line:string) => !line.includes('---')).forEach((line:string) => {
@@ -47,16 +47,23 @@ const handleFile = (content: string, filePath: string):HeaderInfo => {
     })
 
     logger.info(headerText)
+    if (headerText == null) {
+        // headerInfo.title = 'UnTitle'
+    }
 
     delete headerInfo.isArrayItem
     delete headerInfo.arrItemTag 
     
-
     if (!headerInfo.tags || 
         (headerInfo.tags && headerInfo.tags.length === 0)) {
         headerInfo.tags = ['UnTag']
-    }
 
+        if (!headerInfo.tag || 
+            (headerInfo.tag && headerInfo.tag.length === 0)) {
+            headerInfo.tags = headerInfo.tag
+        }
+    }
+    
     headerInfo.path = filePath
     logger.info(headerInfo)
     return headerInfo;

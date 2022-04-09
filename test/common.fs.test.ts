@@ -8,8 +8,7 @@ console.info()
 //   assert("Hello");
 // }); 
 
-const a = fs.walkDirSync('.').filter((value) => {
-    return value.name.endsWith('.ts')
-})
+const a = fs.statSync('./readme.md')
 
 console.info(a)
+

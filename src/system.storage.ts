@@ -4,7 +4,7 @@
 
 import logger from '@/log/console.ts'
 import fs from '@/common/common.fs.ts'
-import path from './common/common.path.ts'
+import path from '@/common/common.path.ts'
 
 interface IGetP {
     key: string

@@ -6,10 +6,15 @@ import { AsyncIpcController } from "@/ipc/AsyncIpcController.ts"
 import { AsyncIpcData } from "@/ipc/AsyncIpcController.ts"
 import ReadBlog, { HeaderInfo } from "@/kftodo/ReadBlog.ts"
 import Path from '@/common/common.path.ts'
+import {BlogTextHelper} from '@/kftodo/blog/BlogTextHelper.ts'
 
 interface IEventData {
     name: string
-    data: string
+    data: any
+}
+
+interface IKfToDoConfig {
+    basePath: string
 }
 
 export default class KfTodoController {
@@ -17,6 +22,12 @@ export default class KfTodoController {
     ipc: AsyncIpcController | null = null
 
     hasFirstConnect = false
+
+    static KFTODO_CONFIG_MD_PATH = Path.homePath() + Path.Dir.Spelator + '.denkui' + Path.Dir.Spelator + '.config.md'
+
+    config:IKfToDoConfig = {
+        basePath: '.'
+    }
 
     async start() {
         let res = (await storage.get({
@@ -61,15 +72,34 @@ export default class KfTodoController {
         logger.info('KfTodoController', 'initData')
         const listDataRes = await storage.get({ key: 'listData' })
         if (!listDataRes.data) {
+            const confgPath = KfTodoController.KFTODO_CONFIG_MD_PATH
+            const configTitle = 'KfTodoConfig'
+            const configTags =  ['_KfTodoConfig']
+            let item: HeaderInfo = {
+                "title": configTitle,
+                "date": new Date().toDateString(),
+                "dateMs" : new Date().getTime(),
+                "path": confgPath,
+                "tags":configTags
+            }
+            if (!fs.statSync(confgPath).isExist) {
 
-            // const dataIndexConfigPath = 'C:\\Users\\wimkf\\Desktop\\wor\\blog\\result.json'
-            
-            // const content = fs.readFileSync(dataIndexConfigPath)
-            // listDataRes.data = JSON.parse(content)
-
-            // // logger.info('KfTodoController', 'initData', dataIndexConfigPath, content)
-            // await storage.set({ key: 'listData', value: listDataRes.data })
-            listDataRes.data = []
+               
+                const content = BlogTextHelper.GenerateEmptyText(configTitle, configTags, JSON.stringify({
+                    basePath: '.'
+                }, null, 2));
+    
+                fs.mkdirSync(Path.getDirPath(confgPath), { recursive: true})
+                fs.writeFileSync(confgPath, content);
+            } else {
+                const currentConfigContent = fs.readFileSync(confgPath)
+                this.config = JSON.parse(BlogTextHelper.GetContentFromText(currentConfigContent))
+                item = ReadBlog.handleFile(currentConfigContent, confgPath)
+            }
+            listDataRes.data = {
+                headerInfos: [item]
+            }
+            await storage.set({ key: 'listData', value: listDataRes.data})
         }
 
         this.send({
@@ -105,27 +135,61 @@ export default class KfTodoController {
                     "path": path,
                     "tags": []
                 }
-                listDataRes.data.headerInfos.push(item)
+                listDataRes.data.headerInfos &&  listDataRes.data.headerInfos.push(item)
             } else {
                 item = hitItems[0]
             }
 
-            try {
-                let info:HeaderInfo = ReadBlog.handleFile(content, path);
-                item.title = info.title
-                item.date = info.date
-                item.path = info.path
-                item.tags = info.tags
-            } catch (err) {
-                ipcData.data = {
-                    msg: 'error: ' + err
+            if (path === KfTodoController.KFTODO_CONFIG_MD_PATH) {
+                try { 
+                    const configContent = BlogTextHelper.GetContentFromText(content).trim()
+                    logger.info('KfTodoController ', configContent)
+                    this.config = JSON.parse(configContent) 
+                    const files = fs.walkDirSync(this.config.basePath).filter((value) => {
+                        return value.name.endsWith('.md')
+                    })
+                    
+                    const infos = files.map(i => {
+                        logger.info('KfTodoController ', i)
+                        return ReadBlog.handleFile(fs.readFileSync(i.path), i.path)
+                    }).filter(i => {
+                        return i.title
+                    })
+                    logger.info('KfTodoController ', infos)
+
+                    const resData = {
+                        headerInfos: infos.concat([item])
+                    }
+                    await storage.set({ key: 'listData', value: resData }); 
+                    this.send({
+                        name: 'initData',
+                        data: resData
+                    })
+                } catch (err) {
+                    logger.info('KfTodoController', err)
+                    ipcData.data = {
+                        msg: 'error: ' + err
+                    }
+                    this.ipc?.response(ipcData)
                 }
+            } else {
+                try {
+                    let info:HeaderInfo = ReadBlog.handleFile(content, path);
+                    item.title = info.title
+                    item.date = info.date
+                    item.path = info.path
+                    item.tags = info.tags
+                } catch (err) {
+                    ipcData.data = {
+                        msg: 'error: ' + err
+                    }
+                    this.ipc?.response(ipcData)
+                    return
+                }
+                await storage.set({ key: 'listData', value: listDataRes.data });
                 this.ipc?.response(ipcData)
-                return
             }
 
-            await storage.set({ key: 'listData', value: listDataRes.data });
-            this.ipc?.response(ipcData)
         }
         if (invokeName === 'deleteItem') {
             const { path } = invokeData
@@ -143,22 +207,7 @@ export default class KfTodoController {
             this.ipc?.response(ipcData)
         }
         if (invokeName === 'getNewBlogTemplate') {
-            const content = 
-`---
-title: UnNamed
-date: ${new Date().toLocaleString()}
-tags:
----
-
-
-
-
-
-
-
-
-
-`
+            const content = BlogTextHelper.GenerateEmptyText();
             ipcData.data = {
                 content
             }
@@ -182,7 +231,7 @@ tags:
 
             logger.info('KfTodoController onMessage event', event)
             if (event.name === 'onFirstConnect') {
-                // this.initData()
+                this.initData()
             }
 
             if (event.name === 'invoke') {

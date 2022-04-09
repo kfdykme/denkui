@@ -48,10 +48,25 @@ const walkDirSync = (filePath: string):IReadDirRes[] => {
     return res
 }
 
+
+const statSync = (filePath: string) => {
+    try {
+        const fileid = Deno.openSync(filePath, { read: true })
+        return {
+            isExist: true,
+            ... Deno.fstatSync(fileid.rid)
+        }
+    } catch (err) {
+        return {
+            isExist: false
+        }
+    }
+}
 export default {
     readFileSync,
     writeFileSync,
     mkdirSync,
     readDirSync,
-    walkDirSync
+    walkDirSync,
+    statSync
 }
