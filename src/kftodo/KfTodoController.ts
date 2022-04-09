@@ -83,8 +83,6 @@ export default class KfTodoController {
                 "tags":configTags
             }
             if (!fs.statSync(confgPath).isExist) {
-
-               
                 const content = BlogTextHelper.GenerateEmptyText(configTitle, configTags, JSON.stringify({
                     basePath: '.'
                 }, null, 2));
@@ -209,7 +207,8 @@ export default class KfTodoController {
         if (invokeName === 'getNewBlogTemplate') {
             const content = BlogTextHelper.GenerateEmptyText();
             ipcData.data = {
-                content
+                content,
+                path: this.config.basePath
             }
             this.ipc?.response(ipcData);
         }
