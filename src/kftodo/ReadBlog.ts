@@ -18,7 +18,7 @@ const handleFile = (content: string, filePath: string):HeaderInfo => {
     // console.info()
     const header:any = headerInfoReg.exec(content)
     logger.info('header', header)
-    let headerText = header && header[0].replace(/tag:/, 'tags *:')
+    let headerText = header && header[0].replace(/tag *:/, 'tags:')
     
     // get info from headerText
     const headerInfo: any = {}
@@ -41,7 +41,7 @@ const handleFile = (content: string, filePath: string):HeaderInfo => {
             }
         } else if (line.startsWith('-')) {
             if (headerInfo.isArrayItem) {
-                headerInfo[headerInfo.arrItemTag].push(line.split('-')[1].trim())
+                headerInfo[headerInfo.arrItemTag].push(line.split('-')[1].trim().toLowerCase())
             }
         }
     })
@@ -56,13 +56,15 @@ const handleFile = (content: string, filePath: string):HeaderInfo => {
     
     if (!headerInfo.tags || 
         (headerInfo.tags && headerInfo.tags.length === 0)) {
-        headerInfo.tags = ['UnTag']
 
         if (!headerInfo.tag || 
             (headerInfo.tag && headerInfo.tag.length === 0)) {
             headerInfo.tags = headerInfo.tag
         }
+        headerInfo.tags = ['UnTag']
     }
+
+
     
     headerInfo.path = filePath
     logger.info(headerInfo)
