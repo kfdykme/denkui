@@ -29,6 +29,8 @@ export default class KfTodoController {
         basePath: '.'
     }
 
+
+
     async start() {
         let res = (await storage.get({
             key: 'GLOBAL_PORT'
@@ -104,17 +106,27 @@ export default class KfTodoController {
             name: 'initData',
             data: listDataRes.data
         })
-    }
+
+        const lastReadPathRes =  await storage.get({ key: 'lastReadPath' })
+        if (lastReadPathRes.data) {
+            this.send({
+                name: 'notifyRead',
+                data: lastReadPathRes.data
+            })
+        }
+    }   
 
     async handleInvoke(ipcData: AsyncIpcData) {
         const { invokeName, data:invokeData } = ipcData.data
         if (invokeName === 'readFile') {
-            const content = fs.readFileSync(invokeData)
+            const path = invokeData
+            const content = fs.readFileSync(path)
             ipcData.data = {
                 content,
                 path: invokeData
             }
             this.ipc?.response(ipcData)
+            await storage.set({ key: 'lastReadPath', value: path})
         }
         if (invokeName === 'writeFile') {
             const { content, path} = invokeData
@@ -161,7 +173,7 @@ export default class KfTodoController {
                     await storage.set({ key: 'listData', value: resData }); 
                     this.send({
                         name: 'initData',
-                        data: resData
+                        data: resData,
                     })
                 } catch (err) {
                     logger.info('KfTodoController', err)
@@ -177,6 +189,7 @@ export default class KfTodoController {
                     item.date = info.date
                     item.path = info.path
                     item.tags = info.tags
+                    ipcData.msg = `${ipcData.data.invokeName} success`
                 } catch (err) {
                     ipcData.data = {
                         msg: 'error: ' + err

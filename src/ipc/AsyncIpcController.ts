@@ -5,6 +5,7 @@ export interface AsyncIpcData extends IpcData {
     id:string
     isResponse: boolean
     data: any
+    msg?: string
 }
 
 export class AsyncIpcController extends IpcController {
