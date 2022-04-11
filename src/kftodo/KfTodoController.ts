@@ -73,8 +73,8 @@ export default class KfTodoController {
     async initData() {
         logger.info('KfTodoController', 'initData')
         const listDataRes = await storage.get({ key: 'listData' })
+        const confgPath = KfTodoController.KFTODO_CONFIG_MD_PATH
         if (!listDataRes.data) {
-            const confgPath = KfTodoController.KFTODO_CONFIG_MD_PATH
             const configTitle = 'KfTodoConfig'
             const configTags =  ['_KfTodoConfig']
             let item: HeaderInfo = {
@@ -100,6 +100,10 @@ export default class KfTodoController {
                 headerInfos: [item]
             }
             await storage.set({ key: 'listData', value: listDataRes.data})
+        } else {
+            
+            const currentConfigContent = fs.readFileSync(confgPath)
+            this.config = JSON.parse(BlogTextHelper.GetContentFromText(currentConfigContent))
         }
 
         this.send({
