@@ -232,7 +232,18 @@ export default class KfTodoController {
 
         if (invokeName === 'initData') {
             const { path } = invokeData
-            
+            const files = fs.walkDirSync(path).filter((value) => {
+                return value.name.endsWith('.md')
+            })
+
+            let headerInfos: HeaderInfo[] = files.map((value):HeaderInfo => {
+                return ReadBlog.handleFile(fs.readFileSync(value.path), value.path)
+            })
+
+            ipcData.data = {headerInfos}
+            await storage.set({ key: 'listData', value: ipcData.data });
+            this.ipc?.response(ipcData)
+
         }
     }
 
