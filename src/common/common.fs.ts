@@ -37,6 +37,10 @@ const readDirSync = (filePath: string):IReadDirRes[] => {
 }
 
 const walkDirSync = (filePath: string):IReadDirRes[] => {
+    // const { isExist } = statSync(filePath)
+    // if (!isExist) {
+    //     throw new Error(`walkDirSync error file: ${filePath} is not exist`)
+    // }
     let res:any[] = []
     for(const item of readDirSync(filePath)) {
         if (item.isDirectory) {

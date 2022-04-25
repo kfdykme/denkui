@@ -12,3 +12,10 @@ const a = fs.statSync('./readme.md')
 
 console.info(a)
 
+
+const b = fs.statSync('C:\\Users\\wimkf\\Desktop\\wor\\blog');
+console.info(b)
+
+const c = fs.walkDirSync('C:\\Users\\wimkf\\Desktop\\wor\\blog');
+console.info(c)
+ 

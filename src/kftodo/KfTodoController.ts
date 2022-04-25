@@ -7,6 +7,8 @@ import { AsyncIpcData } from "@/ipc/AsyncIpcController.ts"
 import ReadBlog, { HeaderInfo } from "@/kftodo/ReadBlog.ts"
 import Path from '@/common/common.path.ts'
 import {BlogTextHelper} from '@/kftodo/blog/BlogTextHelper.ts'
+import toast from '@/system.toast.ts'
+
 
 interface IEventData {
     name: string
@@ -57,6 +59,8 @@ export default class KfTodoController {
         setInterval(() => {
             this.heart()
         }, 2000)
+
+        toast.init(this.send)
     }
 
     heart() {
@@ -93,7 +97,17 @@ export default class KfTodoController {
                 fs.writeFileSync(confgPath, content);
             } else {
                 const currentConfigContent = fs.readFileSync(confgPath)
-                this.config = JSON.parse(BlogTextHelper.GetContentFromText(currentConfigContent))
+                try {
+                    this.config = JSON.parse(BlogTextHelper.GetContentFromText(currentConfigContent))
+                } catch (err) {
+                    this.send({
+                        name: 'system.toast',
+                        data: {
+                            error: `${err}`
+                        }
+                    })
+                }
+                
                 item = ReadBlog.handleFile(currentConfigContent, confgPath)
             }
             listDataRes.data = {
@@ -103,7 +117,16 @@ export default class KfTodoController {
         } else {
             
             const currentConfigContent = fs.readFileSync(confgPath)
-            this.config = JSON.parse(BlogTextHelper.GetContentFromText(currentConfigContent))
+            try {
+                this.config = JSON.parse(BlogTextHelper.GetContentFromText(currentConfigContent))
+            } catch (err) {
+                this.send({
+                    name: 'toast',
+                    data: {
+                        error: `${err}`
+                    }
+                })
+            }
         }
 
         this.send({
@@ -159,6 +182,11 @@ export default class KfTodoController {
                     const configContent = BlogTextHelper.GetContentFromText(content).trim()
                     logger.info('KfTodoController ', configContent)
                     this.config = JSON.parse(configContent) 
+                    // if (!isExist) {
+                    //     ipcData.msg = `${ipcData.data.invokeName} file: ${this.config.basePath} n`
+                    //     this.ipc?.response(ipcData)
+                    //     return
+                    // }
                     const files = fs.walkDirSync(this.config.basePath).filter((value) => {
                         return value.name.endsWith('.md')
                     })
@@ -182,7 +210,7 @@ export default class KfTodoController {
                 } catch (err) {
                     logger.info('KfTodoController', err)
                     ipcData.data = {
-                        msg: 'error: ' + err
+                        error: 'error: ' + err
                     }
                     this.ipc?.response(ipcData)
                 }
@@ -196,7 +224,7 @@ export default class KfTodoController {
                     ipcData.msg = `${ipcData.data.invokeName} success`
                 } catch (err) {
                     ipcData.data = {
-                        msg: 'error: ' + err
+                        error: 'error: ' + err
                     }
                     this.ipc?.response(ipcData)
                     return
@@ -258,11 +286,21 @@ export default class KfTodoController {
 
             logger.info('KfTodoController onMessage event', event)
             if (event.name === 'onFirstConnect') {
-                this.initData()
+                this.initData().catch(reason => {
+                    event.data = {
+                        error: reason + ''
+                    }
+                    this.ipc?.response(event)
+                });
             }
 
             if (event.name === 'invoke') {
-                this.handleInvoke(event as AsyncIpcData);
+                this.handleInvoke(event as AsyncIpcData).catch(reason => {
+                    event.data = {
+                        error:  reason +''
+                    }
+                    this.ipc?.response(event)
+                });
             }
         } catch (err) {
             logger.info('KfTodoController onMessage err', err)
