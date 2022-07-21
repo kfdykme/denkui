@@ -2,6 +2,7 @@ import LifeCycleController from '@/core/LifeCycleController.ts';
 import runtime from '@/common/common.runtime.ts';
 import storage from '@/system.storage.ts' 
 import KfTodoController from '@/kftodo/KfTodoController.ts';
+import HttpServer from '@/http/httpserver.ts'
 
 // let lc = LifeCycleController.getInstance()
 
@@ -31,3 +32,6 @@ const kf =  new KfTodoController()
     kf.start()
  }
 
+
+
+HttpServer.startHttpServer()
