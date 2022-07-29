@@ -41,7 +41,6 @@ export default class IpcController {
  
 
     send(data:any) {
-        logger.info("IpcController send type:", typeof data,'data', data)
         data && this.ws?.send(data)
     }
  

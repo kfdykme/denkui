@@ -1,9 +1,10 @@
 
 import Path from '@/common/common.path.ts'
 
- Path.homePath() + Path.Dir.Spelator + '.denkui' + Path.Dir.Spelator 
+//  Path.homePath() + Path.Dir.Spelator + '.denkui' + Path.Dir.Spelator 
 // Start listening on port 8080 of localhost.
 
+let homePath =  '' 
 const startHttpServer = async () => {
 
     const server = Deno.listen({ port: 10825 });
@@ -20,11 +21,12 @@ const startHttpServer = async () => {
         const url = new URL(requestEvent.request.url);
         const filepath = decodeURIComponent(url.pathname);
         console.info('requestEvent.request.url', requestEvent.request.url)
-        let homePath =  '' 
-        try {
-            homePath = requestEvent.request.url.split('home=')[1]
-        } catch {
-
+        if (homePath == '') {
+            try {
+                homePath = requestEvent.request.url.split('home=')[1]
+            } catch {
+                
+            }
         }
         // if (requestEvent.request.url)
         // Try opening the file
