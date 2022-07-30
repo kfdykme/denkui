@@ -155,6 +155,15 @@ export default class KfTodoController {
             this.ipc?.response(ipcData)
             await storage.set({ key: 'lastReadPath', value: path})
         }
+
+        if (invokeName === 'getConfig') {
+            // const configFileContent = fs.readFileSync(KfTodoController.KFTODO_CONFIG_MD_PATH)
+            // const configContent = BlogTextHelper.GetContentFromText(content).trim()
+            // logger.info('kfdebug', this.config)
+            ipcData.data = this.config
+            this.ipc?.response(ipcData)
+        }
+
         if (invokeName === 'writeFile') {
             const { content, path} = invokeData
             fs.mkdirSync(Path.getDirPath(path), { recursive: true})
