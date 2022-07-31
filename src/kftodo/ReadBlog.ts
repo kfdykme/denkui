@@ -6,7 +6,8 @@ export interface HeaderInfo {
     title: string
     date: string
     dateMs?: Number 
-    tags:string[]
+    tags:string[],
+    type?: string 
 }
 
 const handleFile = (content: string, filePath: string):HeaderInfo => {

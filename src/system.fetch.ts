@@ -10,17 +10,31 @@
  
 
 import logger from '@/log/console.ts'  
+
+interface IFetchReq  {
+    url: string,
+    data?: any,
+    method: string,
+    header?: any,
+    res?:any
+    success?:Function
+    complete?:Function
+}
 export default {
-    fetch: async (o:any)=> {
+    do: async (o:IFetchReq) => {
         logger.info('FETCH fetch', o)
 
-        let params = new URLSearchParams(); 
+        let params : URLSearchParams | null = new URLSearchParams(); 
 
-        for (let x in o.data) {
-          params.append(x, o.data[x]);
+        if (o.data != null) {
+            for (let x in o.data) {
+              params.append(x, o.data[x]);
+            }
+        } else {
+            params = null
         }
-        
-        return await fetch(o.url, {
+
+         await fetch(o.url, {
             body: params,
             method: o.method,
             headers: o.header ? o.header : {

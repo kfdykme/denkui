@@ -10,6 +10,8 @@ import {BlogTextHelper} from '@/kftodo/blog/BlogTextHelper.ts'
 import toast from '@/system.toast.ts'
 
 import ConfigManager from '@/kftodo/ConfigManager.ts'
+import { RssController } from "@/kftodo/rss/RssController.ts"
+
 
 interface IEventData {
     name: string
@@ -27,6 +29,9 @@ export default class KfTodoController {
     hasFirstConnect = false
 
     static KFTODO_CONFIG_MD_PATH = Path.homePath() + Path.Dir.Spelator + '.denkui' + Path.Dir.Spelator + '.config.md'
+
+
+    rssController: RssController = new RssController()
 
     config:IKfToDoConfig = {
         basePath: '.'
@@ -62,6 +67,11 @@ export default class KfTodoController {
         }, 2000)
 
         toast.init(this.send)
+        this.rssController.initResponseFunc((data: AsyncIpcData) => {
+            data.isResponse = true;
+
+            this.send(data)
+        })
     }
 
     heart() {
@@ -71,7 +81,7 @@ export default class KfTodoController {
         }))
     }
 
-    send(event: IEventData) {
+    send(event: any) {
         this.ipc?.send(JSON.stringify(event))
     }
 
@@ -160,13 +170,11 @@ export default class KfTodoController {
         }
 
         if (invokeName === 'getConfig') {
-            // const configFileContent = fs.readFileSync(KfTodoController.KFTODO_CONFIG_MD_PATH)
-            // const configContent = BlogTextHelper.GetContentFromText(content).trim()
-            // logger.info('kfdebug', this.config)
             ipcData.data = this.config
             this.ipc?.response(ipcData)
         }
 
+        
         if (invokeName === 'writeFile') {
             const { content, path} = invokeData
             fs.mkdirSync(Path.getDirPath(path), { recursive: true})
@@ -235,10 +243,15 @@ export default class KfTodoController {
             
                         
                         logger.info('KfTodoController ', infos)
-    
+                        
                         const resData = {
                             headerInfos: infos.concat([item])
                         }
+
+                        const otherDatas = listDataRes.data.headerInfos.filter((header:HeaderInfo) => {
+                            return header.type != undefined
+                        })
+                        resData.headerInfos = resData.headerInfos.concat(otherDatas)
                         await storage.set({ key: 'listData', value: resData }); 
                         this.send({
                             name: 'initData',
@@ -341,10 +354,13 @@ export default class KfTodoController {
             this.ipc?.response(ipcData)
 
         }
+
+
+        this.rssController.tryHandleInvoke(ipcData)
     }
 
     onMessage(message: string) {
-        logger.info('KfTodoController onMessage', message, this)
+        logger.info('KfTodoController onMessage', message)
         if (!this.hasFirstConnect) {
             this.hasFirstConnect = true
         }

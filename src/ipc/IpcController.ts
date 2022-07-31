@@ -28,7 +28,6 @@ export default class IpcController {
             
             this.ws.on("message", (message:any) => { 
                 logger.info('IpcController on message', message)
-                logger.info('IpcController callbacks:', this.callbacks)
                 // Array.from(this.callbacks.values()).forEach((i:Function) => { 
                 //     i(message)
                 // })
