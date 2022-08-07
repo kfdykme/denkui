@@ -4,7 +4,7 @@ import path from '@/common/common.path.ts'
 
 const decoder = new TextDecoder('utf-8') 
 const encoder = new TextEncoder()
-const readFileSync = (filePath:string) => {
+const readFileSync = (filePath:string):string => {
     return decoder.decode(Deno.readFileSync(filePath))
 }  
  
@@ -53,7 +53,7 @@ const walkDirSync = (filePath: string):IReadDirRes[] => {
 }
 
 
-const statSync = (filePath: string) => {
+const statSync = (filePath: string): any => {
     try {
         const fileid = Deno.openSync(filePath, { read: true })
         return {
@@ -66,11 +66,25 @@ const statSync = (filePath: string) => {
         }
     }
 }
+const isEmptyFile = (filePath: string) => {
+    const s = statSync(filePath);
+    if (!s.isExist) {
+        return true
+    }
+
+    if (s.isFile) {
+        return readFileSync(filePath).trim() === ""
+    }
+
+    return true
+}
+
 export default {
     readFileSync,
     writeFileSync,
     mkdirSync,
     readDirSync,
     walkDirSync,
-    statSync
+    statSync,
+    isEmptyFile
 }

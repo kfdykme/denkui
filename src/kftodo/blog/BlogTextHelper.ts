@@ -1,6 +1,6 @@
 
 export class BlogTextHelper {
-    static GenerateEmptyText(title: string = 'UnNamed', tags: string[] = [], content:string = ''): string {
+    static GenerateEmptyText(title: string = '${title}', tags: string[] = ['${tag}'], content:string = ''): string {
         const res = 
         `---
 title: ${title}
