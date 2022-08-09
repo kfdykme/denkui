@@ -38,6 +38,7 @@ const getStrFromXMLJson = (value: any): string => {
     }
 };
 
+
 interface IRSSItem {
     title: string;
     link: string;
@@ -61,6 +62,8 @@ interface IRSS {
     channel: IRSSChannel;
 }
 
+
+
 export class RssController {
     responseFunc: Function | undefined;
 
@@ -78,7 +81,7 @@ export class RssController {
         }
     }
 
-    convertJSON2RssObject(rss: any): IRSS | undefined {
+    convertJSON2RssObject(rss: any, baseUrl:string): IRSS | undefined {
         if (typeof rss !== "object") {
             return undefined;
         }
@@ -120,15 +123,19 @@ export class RssController {
                 channel: {
                     title: _s(rss.title),
                     description: _s(rss.subtitle),
-                    link: _s(rss.link[1]['_attributes'].href),
+                    link: _s(getFirstObjectByName(rss.link, 'href')),
                     item: rss.entry.map((entryItem: any) => {
                         console.info(entryItem)
+                        let rssItemlink = getFirstObjectByName(entryItem.link, 'href')
+                        if (rssItemlink.startsWith('/')) {
+                            rssItemlink = new URL(baseUrl).origin + rssItemlink
+                        }
                         return  {
                             title: _s(entryItem.title),
                             pubDate: _s(entryItem.published),
                             description: _s(entryItem.summary),
-                            link: entryItem.link['_attributes'].href,
-                            author: _s(entryItem.author.name)
+                            link: rssItemlink,
+                            author: _s(entryItem.author?.name)
                             // category: _s(entryItem.category)
                         } as IRSSItem
                     })
@@ -147,7 +154,12 @@ export class RssController {
         if (invokeName === "addRss") {
             const { url } = invokeData;
             console.info('tryhandleInvoke addRss', invokeData, url)
-            const listDataRes = await storage.get({ key: "listData" });
+            let listDataRes = await storage.get({ key: "listData" });
+            if (listDataRes.data === undefined) {
+                listDataRes.data = {
+                    headerInfos: []
+                }
+            }
             let isResed = false;
             // fetch url
             new Promise((resolve, reject) => {
@@ -171,7 +183,7 @@ export class RssController {
                     return rssObj;
                 })
                 .then((rss) => {
-                    const res = this.convertJSON2RssObject(rss);
+                    const res = this.convertJSON2RssObject(rss, url);
                     if (res == undefined) {
                         throw Error("convert rss object fail");
                     }

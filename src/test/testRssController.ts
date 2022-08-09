@@ -11,13 +11,21 @@ rssController.initResponseFunc((data: any) => {
 })
 
 
+
+
+const testRssUrl = ['https://ddeville.me/feed.xml','https://sspai.com/feed']
+
+
+
+const testRss = (url:string) => {
+    
 let testRssData: AsyncIpcData = {
     id: 'test_id_0',
     isResponse: false,
     data: {
         invokeName: 'addRss',
         data: {
-            url: 'https://sspai.com/feed'
+            url:url
         }
     }
 }
@@ -31,3 +39,6 @@ const testFail = (text:string) => {
 if (!res) {
     testFail('tryHandleInvoke return false')
 }
+}
+
+testRssUrl.forEach(testRss)

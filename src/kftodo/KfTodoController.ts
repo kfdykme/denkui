@@ -371,6 +371,7 @@ export default class KfTodoController {
     }
     if (invokeName === "deleteItem") {
       const { path } = invokeData;
+      await fs.unlinkFile(path)
       const listDataRes = await storage.get({ key: "listData" });
       const hitItems = listDataRes.data.headerInfos.filter((item: any) => {
         if (item.path == path) {
@@ -379,6 +380,7 @@ export default class KfTodoController {
         return item.path != path;
       });
       listDataRes.data.headerInfos = hitItems;
+      
       await storage.set({ key: "listData", value: listDataRes.data });
 
       this.ipc?.response(ipcData);

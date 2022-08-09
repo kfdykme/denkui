@@ -79,6 +79,10 @@ const isEmptyFile = (filePath: string) => {
     return true
 }
 
+const unlinkFile = (filePath: string) => {
+    return Deno.removeSync(filePath);
+}
+
 export default {
     readFileSync,
     writeFileSync,
@@ -86,5 +90,6 @@ export default {
     readDirSync,
     walkDirSync,
     statSync,
-    isEmptyFile
+    isEmptyFile,
+    unlinkFile
 }
