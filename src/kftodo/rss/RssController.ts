@@ -32,7 +32,7 @@ const getStrFromXMLJson = (value: any): string => {
         return "";
     }
     try {
-        return value["_text"];
+        return value["_text"] || value["_cdata"];
     } catch (err) {
         return err + "";
     }

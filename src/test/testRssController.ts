@@ -7,13 +7,16 @@ import { RssController } from "@/kftodo/rss/RssController.ts";
 const rssController = new RssController();
 
 rssController.initResponseFunc((data: any) => {
-    console.info('rss controller response:', JSON.stringify(data))
+    console.info('rss controller response:', JSON.stringify(data, null,2))
 })
 
 
 
 
-const testRssUrl = ['https://ddeville.me/feed.xml','https://sspai.com/feed']
+const testRssUrl = [
+//     'https://ddeville.me/feed.xml'
+// ,'https://sspai.com/feed',
+ "https://deno.com/feed"]
 
 
 
