@@ -86,8 +86,12 @@ export default class KfTodoController {
   async initData() {
     logger.info("KfTodoController", "initData");
     const listDataRes = await storage.get({ key: "listData" });
+    
+    logger.info("KfTodoController initData getlistdata");
     const confgPath = KfTodoController.KFTODO_CONFIG_MD_PATH;
-    if (!listDataRes.data) {
+    
+    if (!listDataRes.data || !fs.statSync(confgPath).isExist) {
+      logger.info("KfTodoController initData getlistdata", listDataRes.data.length);
       const configTitle = "KfTodoConfig";
       const configTags = ["_KfTodoConfig"];
       let item: HeaderInfo = {
@@ -199,9 +203,11 @@ export default class KfTodoController {
 
   async initInjectJsFile() {
     const editorInjectJsPath = this.config["editorInjectJsPath"];
-    if (!editorInjectJsPath || fs.isEmptyFile(editorInjectJsPath)) {
-      // init inject js file
-      fs.writeFileSync(editorInjectJsPath!, defaulttext.injectJsContent);
+    if (typeof editorInjectJsPath === 'string') {
+      if (!editorInjectJsPath || fs.isEmptyFile(editorInjectJsPath)) {
+        // init inject js file
+        fs.writeFileSync(editorInjectJsPath!, defaulttext.injectJsContent);
+      }
     }
   }
 
@@ -284,6 +290,7 @@ export default class KfTodoController {
     }
 
     if (invokeName === "saveConfig") {
+      logger.info("on saveConfig", ipcData.data.data)
       let cacheConfig = this.config as any;
       for (let x in ipcData.data.data) {
         cacheConfig[x] = ipcData.data.data[x];
