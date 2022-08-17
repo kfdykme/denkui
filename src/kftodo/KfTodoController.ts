@@ -378,7 +378,10 @@ export default class KfTodoController {
     }
     if (invokeName === "deleteItem") {
       const { path } = invokeData;
-      await fs.unlinkFile(path)
+      logger.info("KfTodoController try deleteItem", path);
+      if (!path.startsWith('http')) {
+        await fs.unlinkFile(path)
+      }
       const listDataRes = await storage.get({ key: "listData" });
       const hitItems = listDataRes.data.headerInfos.filter((item: any) => {
         if (item.path == path) {
