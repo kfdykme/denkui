@@ -154,11 +154,7 @@ export default class KfTodoController {
         },
       });
     }
-
-    this.send({
-      name: "initData",
-      data: listDataRes.data,
-    });
+    this.initByConfig()
 
     const lastReadPathRes = await storage.get({ key: "lastReadPath" });
     if (lastReadPathRes.data) {
