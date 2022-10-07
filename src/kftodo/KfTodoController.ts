@@ -12,6 +12,7 @@ import toast from "@/system.toast.ts";
 import ConfigManager from "@/kftodo/ConfigManager.ts";
 import { RssController } from "@/kftodo/rss/RssController.ts";
 import defaulttext from "@/defaulttext/defaulttext.ts";
+import { LocalHistoryService } from "@/kftodo/history/LocalHistoryService.ts";
 
 interface IEventData {
   name: string;
@@ -314,11 +315,29 @@ export default class KfTodoController {
       this.initByConfig();
     }
 
+    if (invokeName === 'readLocalHistory') {
+      const { path } = invokeData
+      const res = LocalHistoryService.Get(this.config.basePath).onReadLocalHistory(path)
+
+      ipcData.data = {
+        history: res
+      }
+      this.ipc?.response(ipcData);
+    }
+
     if (invokeName === "writeFile") {
       const { content, path } = invokeData;
       fs.mkdirSync(Path.getDirPath(path), { recursive: true });
       fs.writeFileSync(path, content);
-
+      
+      // Feature 101 文件本地历史记录
+      LocalHistoryService.Get(this.config.basePath).onWriteFile(path, content)
+      .then(res => {
+        // TODO 等到反馈log变成可堆叠的时候再说
+        // ipcData.msg = `LocalHistoryService onWriteFile status: ${res}`;
+        // this.ipc?.response(ipcData);
+      })
+      
       logger.info("handleInvoke writeFile path:", path);
       if (
         path.endsWith(ConfigManager.getFileExtByType("script", this.config))
