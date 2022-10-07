@@ -587,7 +587,12 @@ const injectJsContent = 'console.info("DENKUI_EDITOR_INJECT start");\n' +
 '    }\n' +
 '}'
 
+
+const defaultJsContents: string[] = []
+
+
 export default {
     defaultJsContent,
+    defaultJsContents,
     injectJsContent
 };

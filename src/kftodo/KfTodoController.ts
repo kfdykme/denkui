@@ -21,7 +21,7 @@ interface IEventData {
 
 interface IKfToDoConfig {
   basePath: string;
-  editorInjectJsPath?: string;
+  editorInjectJsPath?: string | string[];
 }
 
 export default class KfTodoController {
@@ -200,6 +200,22 @@ export default class KfTodoController {
       : [];
   }
 
+  generateInjectJsFile(): string[] {
+    const binPath = Deno.env.get('_')
+    if (!binPath) {
+      return []
+    }
+    const editorInjectJsPath = binPath.substring(0,binPath.lastIndexOf('/') + 1) + '..' 
+    + Path.Dir.Spelator + 'Resources' 
+    + Path.Dir.Spelator + 'manoco-editor'
+    + Path.Dir.Spelator + 'inject';
+    const res = fs.walkDirSync(editorInjectJsPath).map(i => {
+      return i.path
+    })
+    logger.info("KfTodoController generateInjectJsFile", res);
+    return res
+  }
+
   async initInjectJsFile() {
     const editorInjectJsPath = this.config["editorInjectJsPath"];
     if (typeof editorInjectJsPath === 'string') {
@@ -297,8 +313,13 @@ export default class KfTodoController {
 
       // get config content
       const content = fs.readFileSync(KfTodoController.KFTODO_CONFIG_MD_PATH);
-      const headerContent = BlogTextHelper.GetHeaderInfoFromText(content);
+      let headerContent = BlogTextHelper.GetHeaderInfoFromText(content);
+      if (headerContent === null) {
+        headerContent = ''
+      }
 
+
+      this.config["editorInjectJsPath"] = this.generateInjectJsFile()
       const newContent = headerContent + JSON.stringify(cacheConfig, null, 2);
 
       fs.mkdirSync(Path.getDirPath(KfTodoController.KFTODO_CONFIG_MD_PATH), {
@@ -308,9 +329,9 @@ export default class KfTodoController {
 
       this.config = cacheConfig;
 
-      this.initInjectJsFile();
+      // this.initInjectJsFile();
 
-      this.initDefaultJsFile();
+      // this.initDefaultJsFile();
 
       this.initByConfig();
     }
