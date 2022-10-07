@@ -42,14 +42,14 @@ export default class KfTodoController {
     let res = (await storage.get({
       key: "GLOBAL_PORT",
     }) as any);
-    let iport = 8082;
+    let iport = 8673;
     try {
       iport = Number.parseInt(res.data);
     } catch (err) {
       logger.error("KfTodoController", err);
     }
     logger.info("KfTodoController port ", res.data, iport);
-    this.ipc = new AsyncIpcController(iport || 8082);
+    this.ipc = new AsyncIpcController(iport || 8673);
 
     const onMessageHandler = (message: string) => {
       this.onMessage(message);

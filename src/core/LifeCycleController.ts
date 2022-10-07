@@ -104,7 +104,7 @@ export default class LifeCycleController {
         let port:string = (await storage.get({
             key: 'GLOBAL_PORT'
         })) as string
-        this.ipc = new IpcController(Number.parseInt(port) || 8082)
+        this.ipc = new IpcController(Number.parseInt(port) || 8673)
         logger.info("LifeCycleController waiting flutter response.")
         
         this.ipc.addCallback((message:string) => { 

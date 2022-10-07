@@ -12,7 +12,7 @@ import HttpServer from '@/http/httpserver.ts'
 let args = runtime.GetArgs()
 let isLcOpen = false
 let global = {
-    port: 8082
+    port: 8673
 }
 args.forEach((val: string) => {
     const portPrefix = '--port='
