@@ -89,8 +89,9 @@ export default class KfTodoController {
     const listDataRes = await storage.get({ key: "listData" });
     
     logger.info("KfTodoController initData getlistdata");
+    logger.info("KfTodoController initData getlistdata", (this.config as any)['resourcePath']);
     const confgPath = KfTodoController.KFTODO_CONFIG_MD_PATH;
-    
+    const resourcePath = (this.config as any)['resourcePath']
     try {
       if (!listDataRes.data || !fs.statSync(confgPath).isExist) {
         logger.info("KfTodoController initData getlistdata", listDataRes.data?.length);
@@ -155,6 +156,8 @@ export default class KfTodoController {
         },
       });
     }
+
+    (this.config as any)['resourcePath'] = resourcePath
     this.initByConfig()
 
     const lastReadPathRes = await storage.get({ key: "lastReadPath" });
@@ -236,6 +239,10 @@ export default class KfTodoController {
   }
 
   async initByConfig() {
+    const readmeContent = fs.readFileSync((this.config as any)['resourcePath'] +  Path.Dir.Spelator + 'readme.md')
+    fs.writeFileSync(this.config["basePath"] + Path.Dir.Spelator + "readme.md",readmeContent)
+    //
+
     const files = fs.walkDirSync(this.config.basePath);
 
     const denkuiblogFiles = files.filter((value) => {
@@ -319,7 +326,7 @@ export default class KfTodoController {
       }
 
 
-      this.config["editorInjectJsPath"] = this.generateInjectJsFile(cacheConfig['resourcePath'])
+      this.config["editorInjectJsPath"] = this.generateInjectJsFile((this.config as any)['resourcePath'])
       const newContent = headerContent + JSON.stringify(cacheConfig, null, 2);
 
       fs.mkdirSync(Path.getDirPath(KfTodoController.KFTODO_CONFIG_MD_PATH), {
@@ -501,6 +508,9 @@ export default class KfTodoController {
 
       logger.info("KfTodoController onMessage event", event);
       if (event.name === "onFirstConnect") {
+        // init resource path
+        const { resourcePath } = event.data as any
+        (this.config as any)['resourcePath'] = resourcePath
         this.initData().catch((reason) => {
           event.data = {
             error: reason + "",
