@@ -1,4 +1,4 @@
-import { WebSocketClient, WebSocketServer } from "https://deno.land/x/websocket@v0.1.3/mod.ts";
+// import { WebSocketClient, WebSocketServer } from "https://deno.land/x/websocket@v0.1.3/mod.ts";
 import logger from '@/log/console.ts'
 
 interface IOnMessageCallbackFunction {
@@ -9,38 +9,45 @@ export interface IpcData {
 
 } 
 
+interface LibSocketData {
+    kind: String
+    value: any
+}
+
 
 
 export default class IpcController {
     
-    wss:WebSocketServer
-    ws:WebSocketClient|null = null
+    // wss:WebSocketServer
+    // ws:WebSocketClient|null = null
+    // @ts-ignore
+    ls:LibSocket
     callbacks:Function[] = []
     onConnected:Function[] = []
+    hasConnected = false
     constructor(port:number) {
-        this.wss = new WebSocketServer(port)
-        logger.info("IpcController init at port ", port)
-        this.wss.on("connection", (ws: WebSocketClient) => {
-            this.ws = ws
-            logger.info('IpcController ws connection success at', new Date())
-            
-            this.onConnected.forEach((i:Function) =>  i())
-            
-            this.ws.on("message", (message:any) => { 
-                logger.info('IpcController on message', message)
-                // Array.from(this.callbacks.values()).forEach((i:Function) => { 
-                //     i(message)
-                // })
-                this.callbacks.forEach((i:Function) => {
-                    i(message)
-                })
-            }) 
-        }) 
+        // @ts-ignore
+        this.ls = new LibSocket()
+        
+        this.ls.onData((data:LibSocketData) => {
+            logger.info('IpcController on libsocket message', data)
+            const { value:message} = data
+            if (!this.hasConnected) {
+                this.hasConnected = true
+                this.onConnected.forEach((i: Function) => i())
+                return
+            }
+            this.callbacks.forEach((i:Function) => {
+                i(message)
+            })
+        })
+        
     }
  
 
     send(data:any) {
-        data && this.ws?.send(data)
+        data && this.ls?.send(data)
+        this.ls.start();
     }
  
     addOnConnectCallback(callback: Function) {
