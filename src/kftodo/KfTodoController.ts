@@ -239,9 +239,8 @@ export default class KfTodoController {
   }
 
   async initByConfig() {
-
     const readmeFiles = fs.walkDirSync((this.config as any)['resourcePath'] +  Path.Dir.Spelator + 'readmes')
-    readmeFiles.forEach((readmeFile) => {
+      readmeFiles.forEach((readmeFile) => {
       const readmeContent = fs.readFileSync(readmeFile.path)
       fs.writeFileSync(this.config["basePath"] + Path.Dir.Spelator + readmeFile.name, readmeContent)
     })
@@ -531,15 +530,7 @@ export default class KfTodoController {
         });
       }
     } catch (err) {
-      // logger.info("KfTodoController onMessage err", err);
-      if (message == 'DENKUI_START') {
-        this.ipc?.send(JSON.stringify({
-          name: "heart",
-          data: "KfTodoController " + !this.hasFirstConnect,
-        }));
-      }
-      // this.heart();
-
+      logger.info("KfTodoController onMessage err", err);
     }
   }
 }
