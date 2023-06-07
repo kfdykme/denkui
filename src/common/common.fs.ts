@@ -9,6 +9,9 @@ const readFileSync = (filePath:string):string => {
 }  
  
 const writeFileSync = (filePath:string, content:string) => {
+    if (!statSync(filePath, true, true).isExist) {
+        throw Error("writeFileSyncFail")
+    }
     return Deno.writeFileSync(filePath, encoder.encode(content))
 }
 
@@ -53,9 +56,9 @@ const walkDirSync = (filePath: string):IReadDirRes[] => {
 }
 
 
-const statSync = (filePath: string): any => {
+const statSync = (filePath: string, read: boolean = true, write: boolean = false): any => {
     try {
-        const fileid = Deno.openSync(filePath, { read: true })
+        const fileid = Deno.openSync(filePath, { read: read, write: write })
         return {
             isExist: true,
             ... Deno.fstatSync(fileid.rid)

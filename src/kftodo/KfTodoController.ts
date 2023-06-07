@@ -37,6 +37,7 @@ export default class KfTodoController {
   config: IKfToDoConfig = {
     basePath: ".",
   };
+  heartTimer:number = 0;
 
   async start() {
     let res = (await storage.get({
@@ -61,9 +62,9 @@ export default class KfTodoController {
 
     this.ipc.addOnConnectCallback(onFirstConnect);
     this.ipc.addCallback(onMessageHandler);
-    setInterval(() => {
+    this.heartTimer = setInterval(() => {
       this.heart();
-    }, 2000);
+    }, 500);
 
     toast.init(this.send);
     this.rssController.initResponseFunc((data: AsyncIpcData) => {
@@ -74,10 +75,12 @@ export default class KfTodoController {
   }
 
   heart() {
-    !this.hasFirstConnect && this.ipc?.send(JSON.stringify({
-      name: "heart",
-      data: "KfTodoController " + !this.hasFirstConnect,
-    }));
+    if (!this.hasFirstConnect) {
+        this.ipc?.send(JSON.stringify({
+        name: "heart",
+        data: "KfTodoController " + !this.hasFirstConnect,
+      }));
+    }
   }
 
   send(event: any) {
@@ -158,7 +161,13 @@ export default class KfTodoController {
     }
 
     (this.config as any)['resourcePath'] = resourcePath
-    this.initByConfig()
+    try {
+      this.initByConfig()
+    } catch(err) {
+      this.send({
+        name: 'initFail',
+      })
+    }
 
     const lastReadPathRes = await storage.get({ key: "lastReadPath" });
     if (lastReadPathRes.data) {
@@ -239,6 +248,14 @@ export default class KfTodoController {
   }
 
   async initByConfig() {
+    // check file permission 
+    if (!fs.statSync(this.config["basePath"]).isExist) {
+      this.send({
+        name: 'initByConfigFail'
+      })
+      return;
+    }
+
     const readmeFiles = fs.walkDirSync((this.config as any)['resourcePath'] +  Path.Dir.Spelator + 'readmes')
       readmeFiles.forEach((readmeFile) => {
       const readmeContent = fs.readFileSync(readmeFile.path)
@@ -337,11 +354,6 @@ export default class KfTodoController {
       fs.writeFileSync(KfTodoController.KFTODO_CONFIG_MD_PATH, newContent);
 
       this.config = cacheConfig;
-
-      // this.initInjectJsFile();
-
-      // this.initDefaultJsFile();
-
       this.initByConfig();
     }
 
@@ -503,6 +515,7 @@ export default class KfTodoController {
     logger.info("KfTodoController onMessage", message);
     if (!this.hasFirstConnect) {
       this.hasFirstConnect = true;
+      clearInterval(this.heartTimer);
     }
 
     try {
