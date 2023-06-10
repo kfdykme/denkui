@@ -34,17 +34,17 @@ const isFilted = (...vars:any[]) => {
 export default  {
     info: (...vars: any[]) => {
         if(isFilted(vars)) return 
-        console.info(new Date(), ...vars)
+        console.info(new Date().toJSON(), ...vars)
     },
     error:(...vars: any[]) => {
         if(isFilted(vars)) return
-        console.error(new Date(), ...vars)
+        console.error(new Date().toJSON(), ...vars)
     },
     log:(...vars: any[]) => {
         if(isFilted(vars)) return
-        console.log(new Date(), ...vars)
+        console.log(new Date().toJSON(), ...vars)
     },
     dev:(...vars: any[]) => { 
-        console.log(new Date(), ...vars)
+        console.log(new Date().toJSON(), ...vars)
     }
 }

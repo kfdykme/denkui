@@ -9,9 +9,6 @@ const readFileSync = (filePath:string):string => {
 }  
  
 const writeFileSync = (filePath:string, content:string) => {
-    if (!statSync(filePath, true, true).isExist) {
-        throw Error("writeFileSyncFail")
-    }
     return Deno.writeFileSync(filePath, encoder.encode(content))
 }
 

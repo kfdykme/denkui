@@ -204,7 +204,6 @@ export default class KfTodoController {
 
   async getOtherHeaderInfos(): Promise<Array<HeaderInfo>> {
     const listDataRes = await storage.get({ key: "listData" });
-    console.info("kfdbeug", listDataRes);
     return listDataRes
       ? listDataRes.data.headerInfos.filter((header: HeaderInfo) => {
         return header.type != undefined;
@@ -280,7 +279,7 @@ export default class KfTodoController {
         ConfigManager.getFileExtByType("script", this.config),
       );
     });
-    logger.info("KfTodoController scriptFiles", scriptFiles);
+    // logger.info("KfTodoController scriptFiles", scriptFiles);
 
     scriptFiles.forEach((scriptFile) => {
       infos.push({
@@ -291,7 +290,7 @@ export default class KfTodoController {
       });
     });
 
-    logger.info("KfTodoController ", infos);
+    // logger.info("KfTodoController ", infos);
     const item = await this.getMdHeaderInfoByPath(
       KfTodoController.KFTODO_CONFIG_MD_PATH,
       "DENKUI_CONFIG",
